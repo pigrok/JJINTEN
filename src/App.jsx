@@ -1,8 +1,13 @@
 import "./App.css";
 import React from "react";
+import Router from "./shared/Router";
 
 function App() {
-  return <div className="App">fewa edsadsa dsadsa dsa dsad sa faw</div>;
+  return (
+    <>
+      <Router />
+    </>
+  );
 }
 
 export default App;
