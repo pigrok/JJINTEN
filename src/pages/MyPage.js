@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
-import FileUpload from "../Components/FileUpload";
+import FileUpload from "../components/FileUpload";
 
 const MyPage = () => {
   const { user } = useSelector((state) => {

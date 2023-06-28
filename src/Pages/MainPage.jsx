@@ -1,12 +1,13 @@
 import React from "react";
-import NewsCard from "../Components/NewsCard";
+import NewsCard from "../components/NewsCard";
 import { styled } from "styled-components";
-import NewCardContainer from "../Components/NewCardContainer";
-import NewsCardContainer from "../Components/NewCardContainer";
+import NewCardContainer from "../components/NewCardContainer";
+import NewsCardContainer from "../components/NewCardContainer";
 import { useDispatch } from "react-redux";
 import { openLogin } from "../redux/modules/loginModal";
-import Login from "../Components/Login";
-import Signup from "../Components/Signup";
+import Login from "../components/Login";
+import Signup from "../components/Signup";
+import Form from "../components/Form";
 
 function MainPage() {
   const MainPageWrapper = styled.div`
@@ -77,6 +78,7 @@ function MainPage() {
       </LeftContainer>
       <RightContainer>
         <WriteSEction onClick={loginModalHandler}>글쓰기✏️</WriteSEction>
+        <Form />
         <SortSection>
           <SortButton>조회수순</SortButton>
           <SortButton>좋아요순</SortButton>
