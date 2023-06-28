@@ -6,13 +6,14 @@ import storage from "redux-persist/lib/storage";
 import authReducer from "../modules/auth";
 import loginModal from "../modules/loginModal";
 import signUpModal from "../modules/signUpModal";
-import users from "../modules/users";
+import users from "../modules/users.js";
 
 // Redux Persist 구성
 const persistConfig = {
   key: "root",
   storage,
 };
+
 const rootReducer = combineReducers({
   // users,
   // 여기에 modules

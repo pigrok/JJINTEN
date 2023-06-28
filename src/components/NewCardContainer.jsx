@@ -1,6 +1,7 @@
 import React from "react";
 import NewsCard from "./NewsCard";
 import { styled } from "styled-components";
+
 function NewsCardContainer() {
   const NewsCardContinerWrapper = styled.div`
     display: grid;
