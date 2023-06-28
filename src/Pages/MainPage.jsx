@@ -3,6 +3,12 @@ import NewsCard from "../components/NewsCard";
 import { styled } from "styled-components";
 import NewCardContainer from "../components/NewCardContainer";
 import NewsCardContainer from "../components/NewCardContainer";
+import { useDispatch } from "react-redux";
+import { openLogin } from "../redux/modules/loginModal";
+import Login from "../components/Login";
+import Signup from "../components/Signup";
+import Form from "../components/Form";
+
 function MainPage() {
   const MainPageWrapper = styled.div`
     display: grid;
@@ -56,13 +62,23 @@ function MainPage() {
     top: 600px;
   `;
 
+  const dispatch = useDispatch();
+
+  const loginModalHandler = () => {
+    dispatch(openLogin());
+    console.log("sdfsfsf");
+  };
+
   return (
     <MainPageWrapper>
+      <Login />
+      <Signup />
       <LeftContainer>
         <MenuBar></MenuBar>
       </LeftContainer>
       <RightContainer>
-        <WriteSEction>글쓰기✏️</WriteSEction>
+        <WriteSEction onClick={loginModalHandler}>글쓰기✏️</WriteSEction>
+        <Form />
         <SortSection>
           <SortButton>조회수순</SortButton>
           <SortButton>좋아요순</SortButton>

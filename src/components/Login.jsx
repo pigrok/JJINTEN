@@ -96,6 +96,7 @@ const StModalBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(8px); /* 배경에 blur 효과 적용 */
 `;
 
 const StModalContent = styled.div`
