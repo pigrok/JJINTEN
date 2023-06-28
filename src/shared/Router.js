@@ -1,15 +1,22 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from "../pages/Home";
+import MainPage from "../pages/MainPage";
 import MyPage from "../pages/MyPage";
 
 const Router = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="mypage/:id" element={<MyPage />} />
-      </Routes>
-    </BrowserRouter>
+    <div
+      style={{
+        maxWidth: "1400px",
+        margin: "0 auto",
+      }}
+    >
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="mypage/:id" element={<MyPage />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 };
 
