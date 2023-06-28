@@ -1,16 +1,12 @@
-import "./App.css";
 import React from "react";
 import Router from "./shared/Router";
-import Login from "./components/Login";
-import Singup from "./components/Signup";
-
+import Header from "./components/Header";
 function App() {
   return (
-    <>
-      <Router></Router>
-      {/* <Login /> */}
-      {/* <Singup /> */}
-    </>
+    <div className="App">
+      <Header />
+      <Router />
+    </div>
   );
 }
 
