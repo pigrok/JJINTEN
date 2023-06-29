@@ -1,8 +1,9 @@
 import React from "react";
 import { styled } from "styled-components";
 import testImage1 from "../assets/random1000/test (1).png";
+
 function NewsCard(props) {
-  const NewsCard = styled.div`
+  const SNewsCard = styled.div`
     margin: 0;
     background-color: rgba(255, 255, 255, 0);
     border: none;
@@ -64,9 +65,10 @@ function NewsCard(props) {
     font-size: 12px;
     padding: 5px 5px;
   `;
+
   return (
     <>
-      <NewsCard>
+      <SNewsCard>
         <ImgBox>
           <NewsCardImage src={testImage1} />
         </ImgBox>
@@ -81,7 +83,7 @@ function NewsCard(props) {
           <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>32432개의 댓글</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:30999</NewsEmojiInfos>
         </NewCardInfoSection>
-      </NewsCard>
+      </SNewsCard>
     </>
   );
 }
