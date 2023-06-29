@@ -53,13 +53,13 @@ function NewsCardContainer() {
     navigate(`/${todoId}`);
   };
 
-  const compare = (a, b) => {
-    const aDate = new Date(modifiedDate(a));
-    const bDate = new Date(modifiedDate(b));
+  const compareDateCard = (a, b) => {
+    const aDate = new Date(modifiedDateCard(a));
+    const bDate = new Date(modifiedDateCard(b));
     return bDate - aDate;
   };
 
-  const modifiedDate = (todo) => {
+  const modifiedDateCard = (todo) => {
     if (todo.isModified) {
       return todo.updatedAt;
     } else {
@@ -69,7 +69,7 @@ function NewsCardContainer() {
 
   return (
     <NewsCardContinerWrapper>
-      {todos.sort(compare).map((todo) => {
+      {todos.sort(compareDateCard).map((todo) => {
         return (
           <NewsCard
             key={todo.id}

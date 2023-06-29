@@ -10,7 +10,7 @@ import shortid from "shortid";
 function Detail() {
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
-  const state = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -121,7 +121,7 @@ function Detail() {
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
 
-    if (!name || !contents) {
+    if (!contents) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
     }
@@ -129,12 +129,13 @@ function Detail() {
     try {
       const data = {
         id: shortid.generate(),
-        writer: name,
         contents: contents,
         updatedAt: new Date().toString(),
         isModified: true,
         postId: todo.id,
-        uid: state.uid,
+        uid: user.uid,
+        writer: user.displayName,
+        profile: user.photoURL,
       };
 
       await addDoc(collection(db, "comments"), data);
@@ -159,7 +160,7 @@ function Detail() {
   //   dispatch(setComments(updatedComments));
   // };
 
-  const modifiedDate = (todo) => {
+  const modifiedDateCard = (todo) => {
     if (todo && todo.isModified) {
       return todo.updatedAt;
     } else if (todo && !todo.isModified) {
@@ -169,11 +170,27 @@ function Detail() {
     }
   };
 
+  const compareDateComment = (a, b) => {
+    const aDate = new Date(modifiedDateComment(a));
+    const bDate = new Date(modifiedDateComment(b));
+    return bDate - aDate;
+  };
+
+  const modifiedDateComment = (comment) => {
+    if (comment && comment.isModified) {
+      return comment.updatedAt;
+    } else if (comment && !comment.isModified) {
+      return comment.createdAt;
+    } else {
+      return "";
+    }
+  };
+
   return (
     <div>
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDate(todo)}</div>
+          <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(todo)}</div>
 
           <div style={{ marginRight: "550px" }}>
             {edit ? (
@@ -205,13 +222,6 @@ function Detail() {
         <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>
           <form onSubmit={handleCommentSubmit}>
             <h3>댓글</h3>
-            <input
-              name="이름"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-              }}
-            />
             <br />
             <input
               name="댓글"
@@ -224,11 +234,12 @@ function Detail() {
           </form>
         </div>
         <div>
-          {comments.map((comment) => (
+          {comments.sort(compareDateComment).map((comment) => (
             <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }} key={comment?.id}>
-              <p>name: {comment.writer}</p>
+              <img style={{ height: "50px", width: "50px" }} src={comment.profile}></img>
+              <p>{comment.writer}</p>
               <p>content: {comment.contents}</p>
-              <p>작성일자: {comment.updateAt ? comment.updateAt : "날짜 정보 없음"}</p>
+              <p>작성일자: {modifiedDateComment(comment)}</p>
               {/* <button onClick={() => handleCommentDelete(comment.id)}>삭제</button> */}
             </div>
           ))}
