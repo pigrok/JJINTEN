@@ -1,29 +1,18 @@
-import React from "react";
 import { styled } from "styled-components";
-function Button() {
-  const Button = styled.button`
-    margin: 0;
-    background-color: rgba(255, 255, 255, 0);
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: "Noto Sans KR", Courier New;
-    font-size: 12px;
-    padding: 10px;
-    border-radius: 5px;
-    color: #000000;
-
-    &:hover {
-      background: #dddddd;
-    }
-
-    &:disabled {
-      cursor: default;
-      opacity: 0.5;
-      background: #ffffff;
-    }
-  `;
-  return <Button />;
-}
+const Button = styled.button`
+  height: 30px;
+  cursor: pointer;
+  border: 1px solid black;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  border-radius: 20px 20px 20px 20px;
+  transition: all 0.125s ease-in 0s;
+  background-color: #ffffff;
+  &:hover {
+    background: #212529;
+    color: #ffffff;
+  }
+`;
 
 export default Button;

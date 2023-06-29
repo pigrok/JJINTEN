@@ -47,7 +47,7 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
           error: errorMessage,
         })
       );
-      alert("로그인 실패 >_^");
+      alert(`로그인 실패: ${errorMessage}`);
     }
   };
 
@@ -108,6 +108,7 @@ export default Login;
 
 const StModalBox = styled.div`
   position: fixed;
+  z-index: 1;
   top: 0;
   left: 0;
   width: 100%;

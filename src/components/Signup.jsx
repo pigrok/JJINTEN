@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { styled } from "styled-components";
 import { auth } from "../firebase";
@@ -10,6 +10,7 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
   const [password, setPassword] = useState("");
   const [checkpassword, setCheckPassword] = useState("");
   const [name, setName] = useState("");
+  const [caution, setCaution] = useState("");
   const dispatch = useDispatch();
 
   const onChangeHandler = (event) => {
@@ -39,6 +40,9 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
   // 회원가입 버튼
   const signUpButtonHandler = async (event) => {
     event.preventDefault();
+    // if (email && password && checkpassword && !name) {
+    //   alert("닉네임도 입력해라-_-");
+    // }
     try {
       // 여기서 비동기 처리
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -58,9 +62,20 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
           error: errorMessage,
         })
       );
-      alert("회원가입 실패 >_^");
+      alert(`회원가입 실패: ${errorMessage}`);
     }
   };
+
+  // 비밀번호 확인
+  useEffect(() => {
+    if (password.length !== 6) {
+      setCaution("비밀번호는 최소 6자리로 입력해주세요");
+    } else if (password !== checkpassword) {
+      setCaution("비밀번호가 일치하지 않습니다.");
+    } else {
+      setCaution("");
+    }
+  }, [password, checkpassword]);
 
   return (
     <>
@@ -81,6 +96,7 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
                 <label>비밀번호 확인: </label>
                 <input type="password" value={checkpassword} name="checkpassword" onChange={onChangeHandler} required />
               </div>
+              <span>{caution}</span>
               <div>
                 <label>닉네임: </label>
                 <input type="name" value={name} name="name" onChange={onChangeHandler} required />

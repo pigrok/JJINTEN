@@ -20,6 +20,7 @@ const rootReducer = combineReducers({
   todos: todos,
   comments: comments,
 });
+
 // Persisted Reducer 생성
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
