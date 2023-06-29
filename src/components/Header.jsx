@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled } from "styled-components";
 import logoPic from "../assets/logo_nuki.png";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import Login from "./Login";
+import Signup from "./Signup";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase";
+import { logOutSuccess } from "../redux/modules/auth";
 
 function Header() {
   const state = useSelector((state) => state.auth);
@@ -20,29 +25,20 @@ function Header() {
     navigate(`/mypage/${user.uid}`);
   };
 
-  // // 데이터 가져오기
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const q = query(collection(db, "users"));
-  //     const querySnapshot = await getDocs(q);
+  // 로그인 모달 열기
+  const [loginModal, setLoginModal] = useState(false);
+  const [signUpModal, setSignUpModal] = useState(false);
 
-  //     querySnapshot.forEach((doc) => {
-  //       const data = {
-  //         id: doc.id,
-  //         ...doc.data(),
-  //       };
-  //       setNickname(data.displayName);
-  //       setProfilePic(data.photoURL);
-  //       setUid(data.uid);
-
-  //       // console.log(data.displayName);
-  //     });
-  //   };
-  //   fetchData();
-  // }, []);
+  const openLoginModal = () => {
+    if (!state.user) {
+      setLoginModal(true);
+    }
+  };
 
   return (
     <HeaderWrapper>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <HeaderContainer>
         <LeftSection onClick={clickToMainPage}>
           <ImgBox>
@@ -55,11 +51,14 @@ function Header() {
             <ProfileContainer onClick={clickToMyPage}>
               <span>{user.displayName}님</span>
               <ProfileImg src={user.photoURL} alt="Uploaded" />
-              <span style={{ fontSize: "20px" }}>▾</span>
+              <span style={{ fontSize: "20px" }} onClick={logoutHoverHandler}>
+                ▾
+              </span>
             </ProfileContainer>
           ) : (
-            "로그인 해주세요"
+            <div onClick={openLoginModal}>로그인 해주세요</div>
           )}
+          <button onClick={logOut}>로그아웃</button>
         </RightSection>
       </HeaderContainer>
     </HeaderWrapper>
