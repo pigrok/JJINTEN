@@ -1,47 +1,59 @@
-import React from "react";
-import { styled } from "styled-components";
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import NewsCardContainer from "../components/NewCardContainer";
-import { useDispatch } from "react-redux";
-import { openLogin } from "../redux/modules/loginModal";
+import { useSelector } from "react-redux";
 import Login from "../components/Login";
 import Signup from "../components/Signup";
 import Form from "../components/Form";
 import Button from "../components/Button";
 
 function MainPage() {
-  const dispatch = useDispatch();
+  const [loginModal, setLoginModal] = useState(false);
+  const [signUpModal, setSignUpModal] = useState(false);
+  const [formModal, setFormModal] = useState(false);
+  const state = useSelector((state) => state.auth);
 
-  const loginModalHandler = () => {
-    dispatch(openLogin());
+  // 로그인 모달 열기
+  const openLoginModal = () => {
+    if (!state.user) {
+      setLoginModal(true);
+    }
+  };
+
+  // 글쓰기 모달 열기
+  const openFormModal = () => {
+    if (!state.user) {
+      setLoginModal(true);
+    } else {
+      setFormModal(true);
+    }
   };
   const sortByView = () => {};
   const sortByLike = () => {};
   const sortByComment = () => {};
   return (
-    <>
-      <Login />
-      <Signup />
-      <MainPageWrapper>
-        <LeftContainer>
-          <MenuBar></MenuBar>
-        </LeftContainer>
-        <RightContainer>
-          <WriteSection onClick={loginModalHandler}>글쓰기✏️</WriteSection>
-          <Form />
-          <SortSection>
-            <SortButton onClick={sortByView}>조회수순</SortButton>
-            <SortButton onClick={sortByLike}>좋아요순</SortButton>
-            <SortButton onClick={sortByComment}>댓글순</SortButton>
-          </SortSection>
-          <CardSection>
-            <NewsCardContainer />
-          </CardSection>
-        </RightContainer>
-      </MainPageWrapper>
-      <GoUpButton>▲</GoUpButton>
-    </>
+    <MainPageWrapper>
+      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <LeftContainer>
+        <MenuBar></MenuBar>
+      </LeftContainer>
+      <RightContainer>
+        <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
+        <Form formModal={formModal} setFormModal={setFormModal} />
+        <SortSection>
+          <SortButton onClick={openLoginModal}>조회수순</SortButton>
+          <SortButton>좋아요순</SortButton>
+          <SortButton>댓글순</SortButton>
+        </SortSection>
+        <CardSection>
+          <NewsCardContainer />
+        </CardSection>
+      </RightContainer>
+    </MainPageWrapper>
   );
 }
+
 const MainPageWrapper = styled.div`
   display: grid;
   grid-template-columns: 100px minmax(400px, 1250px) 50px;
