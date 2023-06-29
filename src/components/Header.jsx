@@ -35,20 +35,6 @@ function Header() {
     }
   };
 
-  // 로그아웃 호버
-  const [logoutHover, setLogoutHover] = useState(false);
-  const logoutHoverHandler = () => {
-    setLogoutHover(true);
-  };
-
-  // 로그아웃 버튼
-  const dispatch = useDispatch();
-  const logOut = async (event) => {
-    event.preventDefault();
-    await signOut(auth);
-    dispatch(logOutSuccess());
-  };
-
   return (
     <HeaderWrapper>
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
@@ -65,14 +51,14 @@ function Header() {
             <ProfileContainer onClick={clickToMyPage}>
               <span>{user.displayName}님</span>
               <ProfileImg src={user.photoURL} alt="Uploaded" />
+              <span style={{ fontSize: "20px" }} onClick={logoutHoverHandler}>
+                ▾
+              </span>
             </ProfileContainer>
           ) : (
             <div onClick={openLoginModal}>로그인 해주세요</div>
           )}
-          <span style={{ fontSize: "20px" }} onClick={logoutHoverHandler}>
-            ▾
-          </span>
-          {state.user && logoutHover && <button onClick={logOut}>로그아웃</button>}
+          <button onClick={logOut}>로그아웃</button>
         </RightSection>
       </HeaderContainer>
     </HeaderWrapper>
