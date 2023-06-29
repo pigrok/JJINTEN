@@ -9,7 +9,7 @@ import signUpModal from "../modules/signUpModal";
 import users from "../modules/users.js";
 import todos from "../modules/todos";
 import comments from "../modules/comments";
-import thunk from "redux-thunk";
+// import thunk from "redux-thunk";
 
 // Redux Persist 구성
 const persistConfig = {
@@ -25,12 +25,16 @@ const rootReducer = combineReducers({
   signUpModal: signUpModal,
   users: users,
   todos: todos,
-  comments: comments,
+  comments,
 });
 // Persisted Reducer 생성
 const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 // export default store;
 // Redux Store 생성
-const store = createStore(persistedReducer, applyMiddleware(thunk));
+const store = createStore(persistedReducer);
 const persistor = persistStore(store);
+
+// const store = createStore(rootReducer);
+
 export { store, persistor };

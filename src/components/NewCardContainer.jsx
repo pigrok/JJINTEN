@@ -3,8 +3,9 @@ import NewsCard from "./NewsCard";
 import { styled } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchTodos } from "../redux/modules/todos";
 import { setTodos } from "../redux/modules/todos";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../firebase";
 function NewsCardContainer() {
   const NewsCardContinerWrapper = styled.div`
     display: grid;
@@ -19,7 +20,21 @@ function NewsCardContainer() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(fetchTodos());
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "todos"));
+        const todos = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdAt = data.createdAt;
+          return { id: doc.id, ...data, createdAt };
+        });
+        dispatch(setTodos(todos));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
   }, [dispatch]);
 
   useEffect(() => {
@@ -31,10 +46,19 @@ function NewsCardContainer() {
   };
 
   const compare = (a, b) => {
-    const aDate = new Date(a.createdAt);
-    const bDate = new Date(b.createdAt);
+    const aDate = new Date(modifiedDate(a));
+    const bDate = new Date(modifiedDate(b));
     return bDate - aDate;
   };
+
+  const modifiedDate = (todo) => {
+    if (todo.isModified) {
+      return todo.updatedAt;
+    } else {
+      return todo.createdAt;
+    }
+  };
+
   return (
     <NewsCardContinerWrapper>
       <div>
@@ -49,9 +73,11 @@ function NewsCardContainer() {
               }}
               onClick={() => navigateClick(todo.id)}
             >
-              <p>{todo.createdAt ? todo.createdAt : "날짜 정보 없음"}</p>
+              {todo.isModified ? <span>(수정됨)</span> : <></>}
+              <p>{modifiedDate(todo)}</p>
               <p>카테고리 : {todo.category}</p>
               <p> 제목:{todo.title}</p>
+
               <p> 내용:{todo.body}</p>
             </div>
           );

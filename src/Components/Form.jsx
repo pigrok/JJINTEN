@@ -3,6 +3,7 @@ import { db } from "../firebase";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import uuid from "react-uuid";
+import shortid from "shortid";
 import { addTodo } from "../redux/modules/todos";
 
 function Form() {
@@ -15,19 +16,19 @@ function Form() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!title || !body) {
+    if (!title || !body || !category) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
     }
 
     try {
       const data = {
-        id: uuid(),
+        id: shortid.generate(),
         category: category,
         title: title,
         body: body,
-        isDone: false,
         createdAt: new Date().toString(),
+        isModified: false,
       };
       await addDoc(collection(db, "todos"), data);
       dispatch(addTodo(data));
@@ -57,6 +58,7 @@ function Form() {
             <option value="공연">공연</option>
             <option value="연극">연극</option>
             <option value="뮤지컬">뮤지컬</option>
+            <option value="페스티벌">페스티벌</option>
           </select>
           <label>제목</label>
           <input

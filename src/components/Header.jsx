@@ -2,6 +2,7 @@ import React from "react";
 import { styled } from "styled-components";
 import logoPic from "../assets/logo_nuki.png";
 import profilePic from "../assets/profile.png";
+import { useNavigate } from "react-router-dom";
 function Header() {
   const HeaderWrapper = styled.div`
     width: 100%;
@@ -55,10 +56,17 @@ function Header() {
   const LogoSpan = styled.span`
     font-size: 30px;
   `;
+
+  const navigate = useNavigate();
+
+  const clickToMinPage = () => {
+    navigate(`/`);
+  };
+
   return (
     <HeaderWrapper>
       <HeaderContainer>
-        <LeftSection>
+        <LeftSection onClick={clickToMinPage}>
           <ImgBox>
             <LogoImg src={logoPic} />
           </ImgBox>

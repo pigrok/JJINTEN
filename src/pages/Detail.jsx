@@ -1,100 +1,181 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { addTodo, deleteTodo, deleteTodoAsync, fetchTodos, setTodos, updateTodo, updateTodoAsync } from "../redux/modules/todos";
+import uuid from "react-uuid";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { db } from "../firebase";
+import { fetchSignInMethodsForEmail } from "firebase/auth";
+import { addComments, fetchComments, setComments } from "../redux/modules/comments";
 import shortid from "shortid";
-import { deleteTodoAsync, fetchTodos, setTodos, updateTodoAsync } from "../redux/modules/todos";
 
 function Detail() {
-  // Redux store에서 state를 가져오기 위해 useState를 사용
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
+  console.log("comments 배열", comments);
 
-  // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [edit, setEdit] = useState(false);
   const [name, setName] = useState("");
   const [contents, setContents] = useState("");
 
-  // useParams를 사용하여 URL에서 파라미터 값을 가져옴
   const { id } = useParams();
-
-  // 가져온 파라미터 id와 일치하는 todo를 찾음
   const todo = todos.find((todo) => todo.id === id);
 
-  // useNavigate를 사용하여 페이지 이동
   const navigate = useNavigate();
-  // useDispatch를 사용하여 action을 디스패치
   const dispatch = useDispatch();
 
-  // 컴포넌트가 마운트될 때(DOM에 추가되어 화면에 나타나는 것)
-  // fetchTodos 액션을 디스패치하여 데이터를 가져옴
   useEffect(() => {
-    dispatch(fetchTodos());
+    const fetchData = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "todos"));
+        const todos = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          const createdAt = data.createdAt;
+          return { id: doc.id, ...data, createdAt };
+        });
+        dispatch(setTodos(todos));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
   }, [dispatch]);
 
-  // todos 배열이 업데이트될 때마다 setTodos 액션을 디스패치하여 상태를 업데이트
   useEffect(() => {
     dispatch(setTodos(todos));
   }, [dispatch, todos]);
 
-  const deleteTodo = () => {
-    dispatch(deleteTodoAsync(todo.id));
-    dispatch(fetchTodos());
-    navigate("/");
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const q = await query(collection(db, "comments"), where("postId", "==", id));
+        const querySnapshot = await getDocs(q);
+        const comments = querySnapshot.docs.map((doc) => {
+          const data = doc.data();
+          return { ...data };
+        });
+        console.log(comments);
+        dispatch(setComments(comments));
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchComments();
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    dispatch(setComments(comments));
+  }, [dispatch, comments]);
+
+  const deleteTodoHandler = async () => {
+    try {
+      const q = query(collection(db, "todos"), where("id", "==", id));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const docRef = querySnapshot.docs[0].ref;
+        await deleteDoc(docRef);
+        dispatch(deleteTodo(id));
+
+        navigate("/");
+      } else {
+        console.log("해당 id를 가진 문서를 찾을 수 없습니다.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const updateTodo = async () => {
-    const updatedTodo = { ...todo, title: title, body: body };
-    await dispatch(updateTodoAsync(updatedTodo));
-    dispatch(fetchTodos());
-    setEdit(false);
+  const updateTodoHandler = async () => {
+    try {
+      if (!title || !body) {
+        alert("제목과 내용을 입력해주세요.");
+        return;
+      }
+
+      const q = query(collection(db, "todos"), where("id", "==", todo.id));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        const docRef = querySnapshot.docs[0].ref;
+        const updatedData = {
+          title: title,
+          body: body,
+          updatedAt: new Date().toString(),
+          isModified: true,
+        };
+        await updateDoc(docRef, updatedData);
+        const updatedTodo = { ...todo, ...updatedData };
+        dispatch(updateTodo(updatedTodo));
+        setEdit(false);
+      } else {
+        console.log("해당 id를 가진 문서를 찾을 수 없습니다.");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const sortCommentsDate = (comments) => {
-    return comments.slice().sort((a, b) => b.updatedAt - a.updatedAt);
-  };
+  const handleCommentSubmit = async (event) => {
+    event.preventDefault();
 
-  // const formatDate = (date) => {
-  //   return new Date(date).toLocaleString("ko-KR", {
-  //     dateStyle: "long",
-  //     timeStyle: "medium",
-  //   });
-  //   // .toString();
-  // };
+    if (!name || !contents) {
+      alert("필수값이 누락되었습니다. 확인해주세요.");
+      return;
+    }
 
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-
-    dispatch({
-      type: "ADD_COMMENT",
-      payload: {
+    try {
+      const data = {
         id: shortid.generate(),
         writer: name,
         contents: contents,
-        todoId: todo.id,
         updatedAt: new Date().toString(),
-      },
-    });
+        postId: todo.id,
+      };
+
+      await addDoc(collection(db, "comments"), data);
+
+      // Firebase에 댓글 추가 후에 새로운 댓글 목록을 가져와서 Redux 상태를 업데이트
+      // dispatch(fetchComments());
+      console.log("comments before dispatch:", data);
+      dispatch(addComments(data));
+
+      setName("");
+      setContents("");
+    } catch (error) {
+      console.error("데이터 추가 에러:", error);
+    }
   };
 
-  const handleCommentDelete = (commentId) => {
-    dispatch({
-      type: "DELETE_COMMENT",
-      payload: commentId,
-    });
+  // const handleCommentDelete = (commentId) => {
+  //   // 삭제할 댓글의 ID를 제외한 나머지 댓글들로 새로운 배열을 생성하여 업데이트
+  //   const updatedComments = comments.filter((comment) => comment.id !== commentId);
+
+  //   // 업데이트된 댓글 배열을 Redux 상태에 반영
+  //   dispatch(setComments(updatedComments));
+  // };
+
+  const modifiedDate = (todo) => {
+    if (todo.isModified) {
+      return todo.updatedAt;
+    } else {
+      return todo.createdAt;
+    }
   };
 
   return (
     <div>
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>
-            <p>작성일자: {todo.createdAt ? todo.createdAt : "날짜 정보 없음"}</p>
-          </div>
+          <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDate(todo)}</div>
+
           <div style={{ marginRight: "550px" }}>
             {edit ? (
-              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updateTodo}>
+              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updateTodoHandler}>
                 저장
               </button>
             ) : (
@@ -102,22 +183,19 @@ function Detail() {
                 수정
               </button>
             )}
-            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodo}>
+            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodoHandler}>
               삭제
-            </button>
-            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => navigate("/")}>
-              이전 화면으로
             </button>
           </div>
         </div>
       </div>
       <div style={{ padding: "10px", margin: "10px", width: "1000px", height: "500px" }}>
         <div style={{ border: "1px solid black", textAlign: "center" }}>
-          <p>title: {todo.title}</p>
+          <p>title: {todo?.title}</p>
           {edit && <input value={title} onChange={(e) => setTitle(e.target.value)} />}
         </div>
         <div style={{ border: "1px solid black", marginTop: "20px", height: "400px" }}>
-          <p>body: {todo.body}</p>
+          <p>body: {todo?.body}</p>
           {edit && <textarea value={body} onChange={(e) => setBody(e.target.value)} />}
         </div>
       </div>
@@ -140,16 +218,16 @@ function Detail() {
                 setContents(e.target.value);
               }}
             />
-            <button>작성</button>
+            <button type="submit">작성</button>
           </form>
         </div>
         <div>
-          {sortCommentsDate(comments).map((comment) => (
+          {comments.map((comment) => (
             <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }} key={comment?.id}>
               <p>name: {comment.writer}</p>
               <p>content: {comment.contents}</p>
-              <p>작성일자: {comment.updatedAt}</p>
-              <button onClick={() => handleCommentDelete(comment.id)}>삭제</button>
+              <p>작성일자: {comment.updateAt ? comment.updateAt : "날짜 정보 없음"}</p>
+              {/* <button onClick={() => handleCommentDelete(comment.id)}>삭제</button> */}
             </div>
           ))}
         </div>
