@@ -8,10 +8,12 @@ import Form from "../components/Form";
 import Button from "../components/Button";
 
 function MainPage() {
+  const state = useSelector((state) => state.auth);
   const [loginModal, setLoginModal] = useState(false);
   const [signUpModal, setSignUpModal] = useState(false);
   const [formModal, setFormModal] = useState(false);
-  const state = useSelector((state) => state.auth);
+
+  const category = ["문화", "전시", "공연", "연극", "뮤지컬", "페스티벌"];
 
   // 로그인 모달 열기
   const openLoginModal = () => {
@@ -36,7 +38,11 @@ function MainPage() {
       <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <LeftContainer>
-        <MenuBar></MenuBar>
+        <MenuBar>
+          {category.map((item) => {
+            return <p>{item}</p>;
+          })}
+        </MenuBar>
       </LeftContainer>
       <RightContainer>
         <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
