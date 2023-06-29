@@ -2,7 +2,7 @@ import React from "react";
 import { styled } from "styled-components";
 import testImage1 from "../assets/random1000/test (1).png";
 
-function NewsCard(props) {
+function NewsCard({ key, createdAt, category, title, body, onClickFunc }) {
   const SNewsCard = styled.div`
     margin: 0;
     background-color: rgba(255, 255, 255, 0);
@@ -65,20 +65,36 @@ function NewsCard(props) {
     font-size: 12px;
     padding: 5px 5px;
   `;
+  const Category = styled.span`
+    position: relative;
+    left: 5px;
+    bottom: 150px;
+    width: 30px;
+  `;
+  const cardOnClick = () => {
+    onClickFunc();
+  };
+  const processCreatedAt = (dateString) => {
+    const date = new Date(Date.parse(dateString));
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const formattedDate = `${year}년${month}월${day}일`;
 
+    return formattedDate;
+  };
   return (
     <>
-      <SNewsCard>
+      <SNewsCard onClick={cardOnClick}>
         <ImgBox>
           <NewsCardImage src={testImage1} />
+          <Category>{category}</Category>
         </ImgBox>
         <NewCardInfoSection>
           <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by:무함마드알콰리즈미</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "4/7", gridRow: "1" }}>YYYY년MM월DD일</NewsEmojiInfos>
-          <NewsTitle style={{ gridColumn: "1/7", gridRow: "2" }}>아아아아아아아아아아아아아아아아아아아아</NewsTitle>
-          <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>
-            아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아아
-          </NewsDesc>
+          <NewsEmojiInfos style={{ gridColumn: "4/7", gridRow: "1" }}>{processCreatedAt(createdAt)}</NewsEmojiInfos>
+          <NewsTitle style={{ gridColumn: "1/7", gridRow: "2" }}>{title}</NewsTitle>
+          <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
           <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:93201</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>32432개의 댓글</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:30999</NewsEmojiInfos>
