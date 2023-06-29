@@ -20,6 +20,7 @@ const initialState = {
 const loginModal = (state = initialState, action) => {
   switch (action.type) {
     case OPEN_LOGIN:
+      // console.log(state);
       return {
         isOpen: true,
       };

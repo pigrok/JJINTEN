@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import MainPage from "../pages/MainPage";
 import MyPage from "../pages/MyPage";
 import Detail from "../pages/Detail";
+import Header from "../components/Header";
 
 const Router = () => {
   return (
@@ -12,6 +13,7 @@ const Router = () => {
       }}
     >
       <BrowserRouter>
+        <Header />
         <Routes>
           <Route path="/" element={<MainPage />} />
           <Route path="/:id" element={<Detail />} />

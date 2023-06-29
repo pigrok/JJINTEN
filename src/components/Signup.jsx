@@ -1,16 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { signUp } from "../redux/modules/auth";
 import { styled } from "styled-components";
-import { useSelector } from "react-redux";
-import { closeSignUp } from "../redux/modules/signUpModal";
+import { auth } from "../firebase";
+import { signUpFailure } from "../redux/modules/auth";
+import { onAuthStateChanged } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
-function Signup() {
+/*
+ * 1. 회원가입 모달창을 연다
+ * 2. 회원가입 입력값을 받는다. (email, pw, nickname, photoURL)
+ * 3. 회원가입 버튼을 누른다
+ * 4. 회원가입 버튼을 누르면 -> 파이어베이스의 Authentication에 저장한다 (createUserWithEmailAndPassword & updateProfile)
+ * 5. 회원가입 완료 알림창을 띄운다
+ * 6. 모달창을 닫는다
+ * 7. 로그인 모달창을 연다
+ * 8. 로그인 한다 (email, pw)
+ * 9. 로그인 완료 알림 후 로그인 모달창을 닫는다.
+ * 10. 유저가 로그인하고 있다는 사실을 어딘가에 저장한다. => redux (localStorage)
+ * 11. 유저 정보를 페이지 우측 상단에 표시한다
+ */
+
+function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [checkpassword, setCheckPassword] = useState("");
   const [name, setName] = useState("");
   const dispatch = useDispatch();
-  const isOpenSignUp = useSelector((state) => state.signUpModal.isOpen);
 
   const onChangeHandler = (event) => {
     const {
@@ -22,26 +37,49 @@ function Signup() {
     if (name === "password") {
       setPassword(value);
     }
+    if (name === "checkpassword") {
+      setCheckPassword(value);
+    }
     if (name === "name") {
       setName(value);
     }
   };
 
-  // 회원가입
-  const signUpButtonHandler = (event) => {
-    event.preventDefault();
-    dispatch(signUp(email, password));
-  };
-
+  // 뒤로가기 버튼
   const backButtonHandler = () => {
-    dispatch(closeSignUp());
+    setSignUpModal(false);
+    setLoginModal(true);
   };
 
-  const user = useSelector((state) => state.users.user);
+  // 회원가입 버튼
+  const signUpButtonHandler = async (event) => {
+    event.preventDefault();
+    try {
+      // 여기서 비동기 처리
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(auth.currentUser, {
+        displayName: name,
+        photoURL: `http://gravatar.com/avatar/${userCredential.user.email}?d=identicon`,
+      });
+
+      // 데이터 동기화
+      alert("회원가입 완료 ^_-");
+      setSignUpModal(false);
+      setLoginModal(true);
+    } catch (error) {
+      const errorMessage = error.message;
+      dispatch(
+        signUpFailure({
+          error: errorMessage,
+        })
+      );
+      alert("회원가입 실패 >_^");
+    }
+  };
 
   return (
     <>
-      {isOpenSignUp ? (
+      {signUpModal ? (
         <StModalBox>
           <StModalContent>
             <button onClick={backButtonHandler}>뒤로가기</button>
@@ -56,7 +94,7 @@ function Signup() {
               </div>
               <div>
                 <label>비밀번호 확인: </label>
-                <input type="password" required />
+                <input type="password" value={checkpassword} name="checkpassword" onChange={onChangeHandler} required />
               </div>
               <div>
                 <label>닉네임: </label>
