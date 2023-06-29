@@ -1,16 +1,15 @@
 import React, { useEffect } from "react";
 import { styled } from "styled-components";
 import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { closeLogin } from "../redux/modules/loginModal";
-import { openSignUp } from "../redux/modules/signUpModal";
-import { login } from "../redux/modules/auth";
+import { useDispatch } from "react-redux";
+import { loginSuccess, loginFailure } from "../redux/modules/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
-function Login() {
+function Login({ loginModal, setSignUpModal, setLoginModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const isOpenLogin = useSelector((state) => state.loginModal.isOpen);
 
   // 입력값 받기
   const onChangeHandler = (event) => {
@@ -25,31 +24,52 @@ function Login() {
     }
   };
 
-  // 로그인
-  const loginButtonHandler = (event) => {
+  // 로그인 버튼
+  const loginButtonHandler = async (event) => {
     event.preventDefault();
-    dispatch(login(email, password));
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      dispatch(
+        loginSuccess({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        })
+      );
+      alert("로그인 성공 ^_-");
+      setLoginModal(false);
+    } catch (error) {
+      const errorMessage = error.message;
+      dispatch(
+        loginFailure({
+          error: errorMessage,
+        })
+      );
+      alert("로그인 실패 >_^");
+    }
   };
 
-  // 창닫기
+  // 창닫기 버튼
   const xButtonHandler = () => {
-    dispatch(closeLogin());
+    setLoginModal(false);
   };
 
   // 회원가입 모달 띄우기
   const signUpButtonHandler = () => {
-    dispatch(closeLogin());
-    dispatch(openSignUp());
+    setLoginModal(false);
+    setSignUpModal(true);
   };
 
   return (
     <>
-      {isOpenLogin ? (
+      {loginModal ? (
         <StModalBox>
           <StModalContent>
             <button onClick={xButtonHandler}>X</button>
             <div>로그인 하세요</div>
-            <mian>
+            <main>
               <div>
                 <div>찐텐으로 즐기자!</div>
                 <div>로고 이미지</div>
@@ -65,7 +85,7 @@ function Login() {
                 </div>
                 <button onClick={loginButtonHandler}>로그인</button>
               </div>
-            </mian>
+            </main>
             <sub>
               <div>아직 계정이 없으신가요?</div>
               <button onClick={signUpButtonHandler}>회원가입</button>
@@ -88,6 +108,7 @@ export default Login;
 
 const StModalBox = styled.div`
   position: fixed;
+  z-index: 1;
   top: 0;
   left: 0;
   width: 100%;
@@ -96,7 +117,7 @@ const StModalBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px); /* 배경에 blur 효과 적용 */
+  backdrop-filter: blur(8px);
 `;
 
 const StModalContent = styled.div`

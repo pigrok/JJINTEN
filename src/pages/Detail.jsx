@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { addTodo, deleteTodo, deleteTodoAsync, fetchTodos, setTodos, updateTodo, updateTodoAsync } from "../redux/modules/todos";
-import uuid from "react-uuid";
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { deleteTodo, setTodos, updateTodo } from "../redux/modules/todos";
+import { addDoc, collection, deleteDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../firebase";
-import { fetchSignInMethodsForEmail } from "firebase/auth";
-import { addComments, fetchComments, setComments } from "../redux/modules/comments";
+import { addComments, setComments } from "../redux/modules/comments";
 import shortid from "shortid";
 
 function Detail() {
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
-  console.log("comments 배열", comments);
+  const state = useSelector((state) => state.auth.user);
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -134,7 +132,9 @@ function Detail() {
         writer: name,
         contents: contents,
         updatedAt: new Date().toString(),
+        isModified: true,
         postId: todo.id,
+        uid: state.uid,
       };
 
       await addDoc(collection(db, "comments"), data);
@@ -160,10 +160,12 @@ function Detail() {
   // };
 
   const modifiedDate = (todo) => {
-    if (todo.isModified) {
+    if (todo && todo.isModified) {
       return todo.updatedAt;
-    } else {
+    } else if (todo && !todo.isModified) {
       return todo.createdAt;
+    } else {
+      return "";
     }
   };
 

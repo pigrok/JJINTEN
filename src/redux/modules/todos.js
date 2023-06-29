@@ -1,6 +1,3 @@
-import { collection, deleteDoc, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { db } from "../../firebase";
-
 const ADD_TODO = "todos/ADD_TODO";
 const DELETE_TODO = "todos/DELETE_TODO";
 const UPDATE_TODO = "todos/UPDATE_TODO";
