@@ -1,38 +1,50 @@
-import { collection, getDocs, query } from "firebase/firestore";
-import React, { useEffect } from "react";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
-import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
 
 const MyPost = () => {
+  const [posts, setPosts] = useState([]);
   const params = useParams();
-  const state = useSelector((state) => state.auth.user);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const q = query(collection(db, "todos"));
+      const q = query(collection(db, "todos"), where("uid", "==", params.id));
       const querySnapshot = await getDocs(q);
 
-      const initialTodos = [];
+      const initArray = [];
 
       querySnapshot.forEach((doc) => {
         const data = {
           id: doc.id,
           ...doc.data(),
         };
-        console.log(doc);
-
-        // const myPosts = data.filter((d) => d.uid === params.id);
-
-        initialTodos.push(data);
+        initArray.push(data);
+        setPosts(initArray);
       });
-
-      //  setTodos(initialTodos);
     };
     fetchData();
   }, []);
 
-  return <div>MyPost</div>;
+  const clickToDetail = (postId) => {
+    navigate(`/${postId}`);
+  };
+
+  return (
+    <div>
+      {posts.map((post) => {
+        return (
+          <div onClick={() => clickToDetail(post.id)} key={post.id} style={{ border: "1px solid black", margin: "10px", padding: "10px" }}>
+            <p>카테고리 : {post.category}</p>
+            <p>제목 : {post.title}</p>
+            <p>내용 : {post.body}</p>
+            <p>날짜 : {post.createdAt}</p>
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 export default MyPost;
