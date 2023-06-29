@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { styled } from "styled-components";
 import { auth } from "../firebase";
 import { signUpFailure } from "../redux/modules/auth";
-import { onAuthStateChanged } from "firebase/auth";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
