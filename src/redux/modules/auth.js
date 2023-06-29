@@ -16,7 +16,7 @@ export const signUpSuccess = (user) => {
 export const signUpFailure = (error) => {
   return {
     type: SIGNUP_FAILURE,
-    payload: error.message,
+    payload: error,
   };
 };
 
@@ -70,13 +70,17 @@ const authReducer = (state = initialState, action) => {
         error: null,
       };
     case SIGNUP_FAILURE:
+      return {
+        ...state,
+        user: null,
+        error: action.payload,
+      };
     case LOGIN_FAILURE:
       return {
         ...state,
         user: null,
         error: action.payload,
       };
-
     case LOGOUT_SUCCESS:
       return { state };
     case UPDATE_DISPLAYNAME:

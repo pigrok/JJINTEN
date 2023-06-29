@@ -6,20 +6,6 @@ import { signUpFailure } from "../redux/modules/auth";
 import { onAuthStateChanged } from "firebase/auth";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
-/*
- * 1. 회원가입 모달창을 연다
- * 2. 회원가입 입력값을 받는다. (email, pw, nickname, photoURL)
- * 3. 회원가입 버튼을 누른다
- * 4. 회원가입 버튼을 누르면 -> 파이어베이스의 Authentication에 저장한다 (createUserWithEmailAndPassword & updateProfile)
- * 5. 회원가입 완료 알림창을 띄운다
- * 6. 모달창을 닫는다
- * 7. 로그인 모달창을 연다
- * 8. 로그인 한다 (email, pw)
- * 9. 로그인 완료 알림 후 로그인 모달창을 닫는다.
- * 10. 유저가 로그인하고 있다는 사실을 어딘가에 저장한다. => redux (localStorage)
- * 11. 유저 정보를 페이지 우측 상단에 표시한다
- */
-
 function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

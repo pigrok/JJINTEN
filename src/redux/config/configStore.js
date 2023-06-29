@@ -4,9 +4,6 @@ import { combineReducers } from "redux";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "../modules/auth";
-import loginModal from "../modules/loginModal";
-import signUpModal from "../modules/signUpModal";
-// import users from "../modules/users.js";
 import todos from "../modules/todos";
 import comments from "../modules/comments";
 import thunk from "redux-thunk";
@@ -18,11 +15,8 @@ const persistConfig = {
 };
 
 const rootReducer = combineReducers({
-  // users,
   // 여기에 modules
   auth: authReducer,
-  loginModal: loginModal,
-  signUpModal: signUpModal,
   todos: todos,
   comments: comments,
 });
@@ -30,7 +24,6 @@ const rootReducer = combineReducers({
 // Persisted Reducer 생성
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// export default store;
 // Redux Store 생성
 const store = createStore(persistedReducer, applyMiddleware(thunk));
 const persistor = persistStore(store);
