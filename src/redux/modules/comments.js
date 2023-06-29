@@ -42,7 +42,7 @@ const comments = (state = initialState, action) => {
   switch (action.type) {
     case ADD_COMMENT: {
       console.log("addComment :44라인 ", state, action.payload);
-      return [...state.comments, action.payload];
+      return [...state, action.payload];
     }
 
     // case "DELETE_COMMENT":

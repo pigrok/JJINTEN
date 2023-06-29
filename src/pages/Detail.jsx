@@ -6,8 +6,14 @@ import { addDoc, collection, deleteDoc, getDocs, query, updateDoc, where } from 
 import { db } from "../firebase";
 import { addComments, setComments } from "../redux/modules/comments";
 import shortid from "shortid";
+import Login from "../components/Login";
+import Signup from "../components/Signup";
 
 function Detail() {
+  // 로그인 및 회원가입 모달 띄우기
+  const [loginModal, setLoginModal] = useState(false);
+  const [signUpModal, setSignUpModal] = useState(false);
+
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
@@ -121,7 +127,9 @@ function Detail() {
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
 
-    if (!contents) {
+    if (!user) {
+      setLoginModal(true);
+    } else if (!contents) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
     }
@@ -186,8 +194,19 @@ function Detail() {
     }
   };
 
+  // 로그인 상태면 작성, 로그인 안 한 상태면 로그인 모달창 띄우기
+  // const writeCommentButtonHandler = () => {
+  //   if (!user) {
+  //     setLoginModal(true);
+  //   } else {
+  //     handleCommentSubmit();
+  //   }
+  // };
+
   return (
     <div>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(todo)}</div>
