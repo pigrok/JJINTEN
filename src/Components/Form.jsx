@@ -10,9 +10,7 @@ function Form({ formModal, setFormModal }) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const state = useSelector((state) => state.auth.user);
-
-  console.log(state);
+  const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
 
@@ -32,7 +30,8 @@ function Form({ formModal, setFormModal }) {
         body: body,
         createdAt: new Date().toString(),
         isModified: false,
-        uid: state.uid,
+        uid: user.uid,
+        writer: user.displayName,
       };
       await addDoc(collection(db, "todos"), data);
       await setDoc(doc(db, "likes", data.id), {

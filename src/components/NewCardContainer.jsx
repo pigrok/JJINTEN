@@ -78,6 +78,7 @@ function NewsCardContainer() {
             category={todo.category}
             title={todo.title}
             body={todo.body}
+            writer={todo.writer}
             updatedAt={todo.updatedAt}
             isModified={todo.isModified}
           />

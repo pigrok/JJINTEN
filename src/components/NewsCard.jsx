@@ -1,8 +1,9 @@
 import React from "react";
 import { styled } from "styled-components";
 import testImage1 from "../assets/random1000/test (1).png";
+import { useSelector } from "react-redux";
 
-function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModified, updatedAt }) {
+function NewsCard({ key, createdAt, category, title, body, writer, onClickFunc, isModified, updatedAt }) {
   const SNewsCard = styled.div`
     margin: 0;
     background-color: rgba(255, 255, 255, 0);
@@ -79,6 +80,8 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModifi
     right: 0;
   `;
 
+  const user = useSelector((state) => state.auth.user);
+
   const cardOnClick = () => {
     onClickFunc();
   };
@@ -91,6 +94,7 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModifi
 
     return formattedDate;
   };
+
   const modifiedDate = () => {
     if (isModified) {
       return updatedAt;
@@ -110,7 +114,7 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModifi
           <NewsCardImage src={testImage1}></NewsCardImage>
         </ImgBox>
         <NewCardInfoSection>
-          <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by:무함마드알콰리즈미</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by: {writer}</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "4/7", gridRow: "1" }}>{processCreatedAt(modifiedDate())}</NewsEmojiInfos>
           <NewsTitle style={{ gridColumn: "1/7", gridRow: "2" }}>{title}</NewsTitle>
           <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
