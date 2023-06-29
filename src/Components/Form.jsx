@@ -1,7 +1,7 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import uuid from "react-uuid";
 import { addTodo } from "../redux/modules/todos";
 import { styled } from "styled-components";
@@ -10,6 +10,9 @@ function Form({ formModal, setFormModal }) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const state = useSelector((state) => state.auth.user);
+
+  console.log(state);
 
   const dispatch = useDispatch();
 
@@ -29,6 +32,7 @@ function Form({ formModal, setFormModal }) {
         body: body,
         isDone: false,
         createdAt: new Date().toString(),
+        uid: state.uid,
       };
       await addDoc(collection(db, "todos"), data);
       dispatch(addTodo(data));

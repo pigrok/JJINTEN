@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import shortid from "shortid";
 import { deleteTodoAsync, fetchTodos, setTodos, updateTodoAsync } from "../redux/modules/todos";
+import Header from "../components/Header";
 
 function Detail() {
   // Redux store에서 state를 가져오기 위해 useState를 사용
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
+  const state = useSelector((state) => state.auth.user);
 
   // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
@@ -74,6 +76,7 @@ function Detail() {
         contents: contents,
         todoId: todo.id,
         updatedAt: new Date().toString(),
+        uid: state.uid,
       },
     });
   };

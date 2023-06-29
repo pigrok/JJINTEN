@@ -4,8 +4,6 @@ import { combineReducers } from "redux";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "../modules/auth";
-import formModal from "../modules/formModal";
-import users from "../modules/users.js";
 import todos from "../modules/todos";
 import comments from "../modules/comments";
 import thunk from "redux-thunk";
@@ -19,11 +17,10 @@ const persistConfig = {
 const rootReducer = combineReducers({
   // 여기에 modules
   auth: authReducer,
-  formModal: formModal,
-  users: users,
   todos: todos,
   comments: comments,
 });
+
 // Persisted Reducer 생성
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
