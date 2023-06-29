@@ -5,9 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Login from "./Login";
 import Signup from "./Signup";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
-import { logOutSuccess } from "../redux/modules/auth";
 
 function Header() {
   const state = useSelector((state) => state.auth);

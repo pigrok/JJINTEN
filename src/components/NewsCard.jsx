@@ -120,7 +120,7 @@ function NewsCard({ key, createdAt, category, title, body, writer, onClickFunc, 
           <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
           <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:93201</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>32432개의 댓글</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:30999</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:</NewsEmojiInfos>
         </NewCardInfoSection>
       </SNewsCard>
     </>
