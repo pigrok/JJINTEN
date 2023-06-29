@@ -10,8 +10,9 @@ import { styled } from "styled-components";
 
 const MyPage = () => {
   const state = useSelector((state) => state.auth.user);
-
+  const [isOpen, setIsOpen] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState("");
+  const [note, SetNote] = useState("");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -25,14 +26,29 @@ const MyPage = () => {
     dispatch(logOutSuccess());
   };
 
-  const onChange = (event) => setNewDisplayName(event.target.value);
+  const onChangeHandler = (event) => {
+    const {
+      target: { name, value },
+    } = event;
+    if (name === "newDisplayName") {
+      setNewDisplayName(value);
+    }
+    if (name === "note") {
+      SetNote(value);
+    }
+  };
 
-  const onSubmit = (event) => {
+  const onSubmitNote = (event) => {
+    event.preventDefault();
+  };
+
+  const onSubmitDisName = (event) => {
     event.preventDefault();
 
     // 기존 닉네임과 변경할 닉네임이 다를 때만 실행
     if (state.displayName !== newDisplayName) {
       updateName();
+      setNewDisplayName("");
     }
   };
 
@@ -49,6 +65,8 @@ const MyPage = () => {
     }
   };
 
+  const clickOpenCloseModal = () => setIsOpen((prev) => !prev);
+
   return (
     <>
       <main
@@ -59,19 +77,36 @@ const MyPage = () => {
         }}
       >
         <button onClick={logOut}>로그아웃</button>
-        <form onSubmit={onSubmit}>
-          <input value={newDisplayName} onChange={onChange} name="newDisplayName" type="text" placeholder="닉네임 변경"></input>
-          <input type="submit" value="Update Profile"></input>
-        </form>
+        <p></p>
+        <button onClick={clickOpenCloseModal}>수정</button>
+        {isOpen && (
+          <ModalBox>
+            <ModalContents>
+              <button onClick={clickOpenCloseModal}>닫기</button>
+              <h2>프로필 수정</h2>
+              <form onSubmit={onSubmitDisName}>
+                <input value={newDisplayName} onChange={onChangeHandler} name="newDisplayName" type="text" placeholder="닉네임 변경"></input>
+                <input type="submit" value="Update DisplayName"></input>
+              </form>
+              <form onSubmit={onSubmitNote}>
+                <input value={note} onChange={onChangeHandler} name="note" type="text" placeholder="한 줄 소개 ..."></input>
+                <input type="submit" value="Update Note"></input>
+              </form>
+              <FileUpload />
+            </ModalContents>
+          </ModalBox>
+        )}
         <h2>프로필</h2>
         <ProfileContainer>
           <ProfilePic src={state.photoURL} alt="Uploaded" />
           <ProfileInfo>
             <p>닉네임 : {state.displayName}</p>
             <p>{state.email}</p>
+            <p>팔로우 ?????? </p>
+            <p>한 줄 소개 : {note}</p>
           </ProfileInfo>
         </ProfileContainer>
-        <FileUpload />
+
         <h2>내가 작성한 게시글</h2>
         <MyPost />
         <h2>내가 좋아요한 게시글</h2>
@@ -81,6 +116,26 @@ const MyPage = () => {
 };
 
 export default MyPage;
+
+const ModalBox = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #dededec9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const ModalContents = styled.div`
+  position: relative;
+  width: 40%;
+  height: 45%;
+  background-color: #ffffff;
+  border-radius: 15px;
+`;
 
 const ProfileContainer = styled.div`
   display: flex;

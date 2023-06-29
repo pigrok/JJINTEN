@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import shortid from "shortid";
 import { deleteTodoAsync, fetchTodos, setTodos, updateTodoAsync } from "../redux/modules/todos";
-import Header from "../components/Header";
 
 function Detail() {
   // Redux store에서 state를 가져오기 위해 useState를 사용
