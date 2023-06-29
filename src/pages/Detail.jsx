@@ -12,14 +12,19 @@ function Detail() {
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
 
+  console.log(user.uid);
+
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [edit, setEdit] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
   const [name, setName] = useState("");
   const [contents, setContents] = useState("");
 
   const { id } = useParams();
   const todo = todos.find((todo) => todo.id === id);
+
+  console.log(todo);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -193,18 +198,23 @@ function Detail() {
           <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(todo)}</div>
 
           <div style={{ marginRight: "550px" }}>
-            {edit ? (
-              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updateTodoHandler}>
-                저장
-              </button>
-            ) : (
-              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => setEdit(true)}>
-                수정
-              </button>
+            {isLogin && (
+              <>
+                {edit ? (
+                  <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updateTodoHandler}>
+                    저장
+                  </button>
+                ) : (
+                  <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => setEdit(true)}>
+                    수정
+                  </button>
+                )}
+
+                <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodoHandler}>
+                  삭제
+                </button>
+              </>
             )}
-            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodoHandler}>
-              삭제
-            </button>
           </div>
         </div>
       </div>

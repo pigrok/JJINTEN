@@ -51,14 +51,12 @@ function Header() {
             <ProfileContainer onClick={clickToMyPage}>
               <span>{user.displayName}님</span>
               <ProfileImg src={user.photoURL} alt="Uploaded" />
-              <span style={{ fontSize: "20px" }} onClick={logoutHoverHandler}>
-                ▾
-              </span>
+              <span style={{ fontSize: "20px" }}>▾</span>
             </ProfileContainer>
           ) : (
             <div onClick={openLoginModal}>로그인 해주세요</div>
           )}
-          <button onClick={logOut}>로그아웃</button>
+          <button>로그아웃</button>
         </RightSection>
       </HeaderContainer>
     </HeaderWrapper>
