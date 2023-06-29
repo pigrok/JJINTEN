@@ -1,20 +1,8 @@
 import React from "react";
 import { styled } from "styled-components";
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { fetchLikeDB } from "../util/like";
-import { fetchLike } from "../redux/modules/like";
 import testImage1 from "../assets/random1000/test (1).png";
 
-function NewsCard({ key, createdAt, category, title, body, onClickFunc }) {
-  const likes = useSelector((state) => state.like);
-  useEffect(() => {
-    async function fetchLikeAsync() {
-      const fetchedlike = await fetchLikeDB(key);
-      fetchLike(fetchedlike.likeNumber);
-    }
-    fetchLikeAsync();
-  });
+function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModified, updatedAt }) {
   const SNewsCard = styled.div`
     margin: 0;
     background-color: rgba(255, 255, 255, 0);
@@ -33,10 +21,12 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc }) {
     }
   `;
   const ImgBox = styled.div`
+    position: relative;
     width: 300px;
     height: 150px;
     overflow: hidden;
     margin: 0 auto;
+    z-index: -1;
   `;
   const NewsCardImage = styled.img`
     border-radius: 5px 5px 0 0;
@@ -78,11 +68,17 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc }) {
     padding: 5px 5px;
   `;
   const Category = styled.span`
-    position: relative;
-    left: 5px;
-    bottom: 150px;
-    width: 30px;
+    position: absolute;
+    top: 0;
+    left: 0;
   `;
+
+  const Modified = styled.span`
+    position: absolute;
+    top: 0;
+    right: 0;
+  `;
+
   const cardOnClick = () => {
     onClickFunc();
   };
@@ -95,21 +91,32 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc }) {
 
     return formattedDate;
   };
+  const modifiedDate = () => {
+    if (isModified) {
+      return updatedAt;
+    } else {
+      return createdAt;
+    }
+  };
+
   return (
     <>
       <SNewsCard onClick={cardOnClick}>
         <ImgBox>
-          <NewsCardImage src={testImage1} />
-          <Category>{category}</Category>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <Category>{category}</Category>
+            {isModified ? <Modified>(수정됨)</Modified> : <></>}
+          </div>
+          <NewsCardImage src={testImage1}></NewsCardImage>
         </ImgBox>
         <NewCardInfoSection>
           <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by:무함마드알콰리즈미</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "4/7", gridRow: "1" }}>{processCreatedAt(createdAt)}</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "4/7", gridRow: "1" }}>{processCreatedAt(modifiedDate())}</NewsEmojiInfos>
           <NewsTitle style={{ gridColumn: "1/7", gridRow: "2" }}>{title}</NewsTitle>
           <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
           <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:93201</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>32432개의 댓글</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:{likes}</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:</NewsEmojiInfos>
         </NewCardInfoSection>
       </SNewsCard>
     </>

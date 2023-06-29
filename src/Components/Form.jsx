@@ -1,8 +1,8 @@
-import { addDoc, collection, serverTimestamp, setDoc, doc } from "firebase/firestore";
+import { addDoc, collection, setDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import uuid from "react-uuid";
+import shortid from "shortid";
 import { addTodo } from "../redux/modules/todos";
 import { styled } from "styled-components";
 
@@ -19,19 +19,19 @@ function Form({ formModal, setFormModal }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!title || !body) {
+    if (!title || !body || !category) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
     }
 
     try {
       const data = {
-        id: uuid(),
+        id: shortid.generate(),
         category: category,
         title: title,
         body: body,
-        isDone: false,
         createdAt: new Date().toString(),
+        isModified: false,
         uid: state.uid,
       };
       await addDoc(collection(db, "todos"), data);
@@ -70,6 +70,7 @@ function Form({ formModal, setFormModal }) {
                   <option value="공연">공연</option>
                   <option value="연극">연극</option>
                   <option value="뮤지컬">뮤지컬</option>
+                  <option value="페스티벌">페스티벌</option>
                 </select>
               </div>
               <div>

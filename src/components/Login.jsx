@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { styled } from "styled-components";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -47,7 +47,7 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
           error: errorMessage,
         })
       );
-      alert("로그인 실패 >_^");
+      alert(`로그인 실패: ${errorMessage}`);
     }
   };
 

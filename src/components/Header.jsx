@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { styled } from "styled-components";
 import logoPic from "../assets/logo_nuki.png";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import Login from "./Login";
+import Signup from "./Signup";
 
 function Header() {
   const state = useSelector((state) => state.auth);
@@ -20,8 +22,20 @@ function Header() {
     navigate(`/mypage/${user.uid}`);
   };
 
+  // 로그인 모달 열기
+  const [loginModal, setLoginModal] = useState(false);
+  const [signUpModal, setSignUpModal] = useState(false);
+
+  const openLoginModal = () => {
+    if (!state.user) {
+      setLoginModal(true);
+    }
+  };
+
   return (
     <HeaderWrapper>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <HeaderContainer>
         <LeftSection onClick={clickToMainPage}>
           <ImgBox>
@@ -37,8 +51,9 @@ function Header() {
               <span style={{ fontSize: "20px" }}>▾</span>
             </ProfileContainer>
           ) : (
-            "로그인 해주세요"
+            <div onClick={openLoginModal}>로그인 해주세요</div>
           )}
+          <button>로그아웃</button>
         </RightSection>
       </HeaderContainer>
     </HeaderWrapper>
