@@ -42,7 +42,7 @@ function MainPage() {
         <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
         <Form formModal={formModal} setFormModal={setFormModal} />
         <SortSection>
-          <SortButton onClick={openLoginModal}>조회수순</SortButton>
+          <SortButton>조회수순</SortButton>
           <SortButton>좋아요순</SortButton>
           <SortButton>댓글순</SortButton>
         </SortSection>

@@ -1,4 +1,4 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, setDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,6 +35,10 @@ function Form({ formModal, setFormModal }) {
         uid: state.uid,
       };
       await addDoc(collection(db, "todos"), data);
+      await setDoc(doc(db, "likes", data.id), {
+        likeNumber: 0,
+        likePeople: [],
+      });
       dispatch(addTodo(data));
       // 입력 필드 초기화
       setCategory("");

@@ -20,27 +20,6 @@ function Header() {
     navigate(`/mypage/${user.uid}`);
   };
 
-  // // 데이터 가져오기
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const q = query(collection(db, "users"));
-  //     const querySnapshot = await getDocs(q);
-
-  //     querySnapshot.forEach((doc) => {
-  //       const data = {
-  //         id: doc.id,
-  //         ...doc.data(),
-  //       };
-  //       setNickname(data.displayName);
-  //       setProfilePic(data.photoURL);
-  //       setUid(data.uid);
-
-  //       // console.log(data.displayName);
-  //     });
-  //   };
-  //   fetchData();
-  // }, []);
-
   return (
     <HeaderWrapper>
       <HeaderContainer>

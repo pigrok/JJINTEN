@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, getDoc } from "firebase/firestore";
 import shortid from "shortid";
 import { deleteTodoAsync, fetchTodos, setTodos, updateTodoAsync } from "../redux/modules/todos";
+import { likeDB, unLikeDB, fetchLikeDB, didIPressed } from "../util/like";
+import { like, unlike, fetchLike } from "../redux/modules/like";
 import Header from "../components/Header";
+import { db } from "../firebase";
 
 function Detail() {
   // Redux store에서 state를 가져오기 위해 useState를 사용
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
-  const state = useSelector((state) => state.auth.user);
-
+  const user = useSelector((state) => state.auth.user);
+  const likeNumber = useSelector((state) => state.like);
   // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [edit, setEdit] = useState(false);
   const [name, setName] = useState("");
+  const [isLike, setIsLike] = useState(false);
   const [contents, setContents] = useState("");
 
   // useParams를 사용하여 URL에서 파라미터 값을 가져옴
@@ -33,13 +38,18 @@ function Detail() {
   // fetchTodos 액션을 디스패치하여 데이터를 가져옴
   useEffect(() => {
     dispatch(fetchTodos());
+    async function fetchLikeAsync() {
+      const fetchedlike = await fetchLikeDB(id);
+      dispatch(fetchLike(fetchedlike.likeNumber));
+      setIsLike(didIPressed(fetchedlike.likePeople, user.uid));
+    }
+    fetchLikeAsync();
   }, [dispatch]);
 
   // todos 배열이 업데이트될 때마다 setTodos 액션을 디스패치하여 상태를 업데이트
   useEffect(() => {
     dispatch(setTodos(todos));
   }, [dispatch, todos]);
-
   const deleteTodo = () => {
     dispatch(deleteTodoAsync(todo.id));
     dispatch(fetchTodos());
@@ -57,14 +67,24 @@ function Detail() {
     return comments.slice().sort((a, b) => b.updatedAt - a.updatedAt);
   };
 
-  // const formatDate = (date) => {
-  //   return new Date(date).toLocaleString("ko-KR", {
-  //     dateStyle: "long",
-  //     timeStyle: "medium",
-  //   });
-  //   // .toString();
-  // };
-
+  const onClickLike = async (e) => {
+    e.preventDefault();
+    const userId = user.uid;
+    const todoId = id;
+    if (likeDB(userId, todoId)) {
+      dispatch(like());
+      setIsLike(!isLike);
+    }
+  };
+  const onClickUnLike = async (e) => {
+    e.preventDefault();
+    const userId = user.uid;
+    const todoId = id;
+    if (unLikeDB(userId, todoId)) {
+      dispatch(unlike());
+      setIsLike(!isLike);
+    }
+  };
   const handleCommentSubmit = (e) => {
     e.preventDefault();
 
@@ -76,7 +96,7 @@ function Detail() {
         contents: contents,
         todoId: todo.id,
         updatedAt: new Date().toString(),
-        uid: state.uid,
+        uid: user.uid,
       },
     });
   };
@@ -108,6 +128,17 @@ function Detail() {
             <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodo}>
               삭제
             </button>
+            {isLike ? (
+              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={onClickUnLike}>
+                ㄴㄴㄴ
+              </button>
+            ) : (
+              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={onClickLike}>
+                좋아요
+              </button>
+            )}
+
+            <span>{likeNumber}</span>
             <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => navigate("/")}>
               이전 화면으로
             </button>

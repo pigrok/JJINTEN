@@ -1,8 +1,20 @@
 import React from "react";
 import { styled } from "styled-components";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { fetchLikeDB } from "../util/like";
+import { fetchLike } from "../redux/modules/like";
 import testImage1 from "../assets/random1000/test (1).png";
 
 function NewsCard({ key, createdAt, category, title, body, onClickFunc }) {
+  const likes = useSelector((state) => state.like);
+  useEffect(() => {
+    async function fetchLikeAsync() {
+      const fetchedlike = await fetchLikeDB(key);
+      fetchLike(fetchedlike.likeNumber);
+    }
+    fetchLikeAsync();
+  });
   const SNewsCard = styled.div`
     margin: 0;
     background-color: rgba(255, 255, 255, 0);
@@ -97,7 +109,7 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc }) {
           <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
           <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:93201</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>32432개의 댓글</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:30999</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:{likes}</NewsEmojiInfos>
         </NewCardInfoSection>
       </SNewsCard>
     </>
