@@ -8,7 +8,15 @@ import { setTodos } from "../redux/modules/todos";
 function NewsCardContainer() {
   const NewsCardContinerWrapper = styled.div`
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    @media screen and (min-width: 520px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @media screen and (min-width: 780px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media screen and (min-width: 1060px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
   `;
 
   const todos = useSelector((state) => {
@@ -37,26 +45,9 @@ function NewsCardContainer() {
   };
   return (
     <NewsCardContinerWrapper>
-      <div>
-        {todos.sort(compare).map((todo) => {
-          return (
-            <div
-              key={todo.id}
-              style={{
-                border: "1px solid black",
-                padding: "10px",
-                margin: "10px",
-              }}
-              onClick={() => navigateClick(todo.id)}
-            >
-              <p>{todo.createdAt ? todo.createdAt : "날짜 정보 없음"}</p>
-              <p>카테고리 : {todo.category}</p>
-              <p> 제목:{todo.title}</p>
-              <p> 내용:{todo.body}</p>
-            </div>
-          );
-        })}
-      </div>
+      {todos.sort(compare).map((todo) => {
+        return <NewsCard key={todo.id} onClickFunc={() => navigateClick(todo.id)} createdAt={todo.createdAt} category={todo.category} title={todo.title} body={todo.body} />;
+      })}
     </NewsCardContinerWrapper>
   );
 }
