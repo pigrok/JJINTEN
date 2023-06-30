@@ -51,6 +51,7 @@ function Form({ formModal, setFormModal }) {
         uid: state.uid,
         likeNumber: 0,
         likePeople: [],
+        writer: user.displayName,
       };
       await addDoc(collection(db, "posts"), data);
       await setDoc(doc(db, "likes", data.id), {

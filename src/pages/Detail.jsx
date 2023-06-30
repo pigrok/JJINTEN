@@ -270,7 +270,6 @@ function Detail() {
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(post)}</div>
-
           <div style={{ marginRight: "550px" }}>
             {isPostCreatedByCurrentUser ? (
               <>
@@ -290,46 +289,46 @@ function Detail() {
             ) : (
               <></>
             )}
+            <div style={{ padding: "10px", margin: "10px", width: "1000px", height: "500px" }}>
+              <div style={{ border: "1px solid black" }}>
+                <p style={{ display: "flex", alignItems: "center" }}>
+                  category:{" "}
+                  {edit ? (
+                    <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                      <option value="category1">문화 </option>
+                      <option value="category2">전시</option>
+                      <option value="category3">공연</option>
+                      <option value="category4">연극</option>
+                      <option value="category5">뮤지컬</option>
+                      <option value="category6">페스티벌</option>
+                    </select>
+                  ) : (
+                    <p>{post?.category}</p>
+                  )}
+                </p>
+              </div>
+            </div>
+            <div style={{ border: "1px solid black", textAlign: "center" }}>
+              <p>title: {post?.title}</p>
+              {edit && <input value={title} onChange={(e) => setTitle(e.target.value)} />}
+            </div>
+            {post && (
+              <div style={{ border: "1px solid black", marginTop: "20px", height: "400px" }}>
+                <p>body: {post.body}</p>
+                {edit && <textarea value={body} onChange={(e) => setBody(e.target.value)} />}
+
+                {post.fileURL && <img style={{ width: "300px", height: "300px" }} src={post.fileURL} />}
+                {edit && (
+                  <div>
+                    <input type="file" onChange={handleFileSelect} />
+                    <button onClick={handleUpload}>Upload</button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <div style={{ padding: "10px", margin: "10px", width: "1000px", height: "500px" }}>
-        <div style={{ border: "1px solid black" }}>
-          <p style={{ display: "flex", alignItems: "center" }}>
-            category:{" "}
-            {edit ? (
-              <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option value="category1">문화 </option>
-                <option value="category2">전시</option>
-                <option value="category3">공연</option>
-                <option value="category4">연극</option>
-                <option value="category5">뮤지컬</option>
-                <option value="category6">페스티벌</option>
-              </select>
-            ) : (
-              <p>{post?.category}</p>
-            )}
-          </p>
-        </div>
-        <div style={{ border: "1px solid black", textAlign: "center" }}>
-          <p>title: {post?.title}</p>
-          {edit && <input value={title} onChange={(e) => setTitle(e.target.value)} />}
-        </div>
-        <div style={{ border: "1px solid black", marginTop: "20px", height: "400px" }}>
-          <p>body: {post?.body}</p>
-          {edit && <textarea value={body} onChange={(e) => setBody(e.target.value)} />}
-          {/* 파일 업로드 */}
-          {post.fileURL && <img style={{ width: "300px", height: "300px" }} src={post.fileURL} />}
-          {/* 파일 수정 */}
-          {edit && (
-            <div>
-              <input type="file" onChange={handleFileSelect} />
-              <button onClick={handleUpload}>Upload</button>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div>
         {" "}
         <br />
