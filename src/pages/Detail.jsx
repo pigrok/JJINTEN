@@ -12,6 +12,7 @@ import Login from "../components/Login";
 import Signup from "../components/Signup";
 import { auth, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Link } from "react-router-dom";
 
 function Detail() {
   // 로그인 및 회원가입 모달 띄우기
@@ -21,6 +22,7 @@ function Detail() {
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
+
   const likeNumber = useSelector((state) => state.like);
 
   // useState를 사용하여 로컬 상태 변수를 정의
@@ -73,7 +75,7 @@ function Detail() {
           const data = doc.data();
           return { ...data };
         });
-        console.log(comments);
+        // console.log(comments);
         dispatch(setComments(comments));
       } catch (error) {
         console.log(error);
@@ -139,6 +141,7 @@ function Detail() {
 
   const onClickLike = async (e) => {
     e.preventDefault();
+    if (!user) return;
     const userId = user.uid;
     const todoId = id;
     if (likeDB(userId, todoId)) {
@@ -148,6 +151,7 @@ function Detail() {
   };
   const onClickUnLike = async (e) => {
     e.preventDefault();
+    if (!user) return;
     const userId = user.uid;
     const todoId = id;
     if (unLikeDB(userId, todoId)) {
@@ -259,7 +263,6 @@ function Detail() {
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(todo)}</div>
-
           <div style={{ marginRight: "550px" }}>
             {edit ? (
               <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updateTodoHandler}>
@@ -282,11 +285,7 @@ function Detail() {
                 좋아요
               </button>
             )}
-
             <span>{likeNumber}</span>
-            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => navigate("/")}>
-              이전 화면으로
-            </button>
           </div>
         </div>
       </div>

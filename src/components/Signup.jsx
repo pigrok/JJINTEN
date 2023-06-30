@@ -137,8 +137,6 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
   );
 }
 
-export default Signup;
-
 const StModalBox = styled.div`
   z-index: 1;
   position: fixed;
@@ -160,3 +158,5 @@ const StModalContent = styled.div`
   height: 50%;
   border-radius: 12px;
 `;
+
+export default Signup;

@@ -12,8 +12,8 @@ function MainPage() {
   const [loginModal, setLoginModal] = useState(false);
   const [signUpModal, setSignUpModal] = useState(false);
   const [formModal, setFormModal] = useState(false);
-
-  const category = ["문화", "전시", "공연", "연극", "뮤지컬", "페스티벌"];
+  const [category, setCategory] = useState("전체");
+  const categories = ["전체", "페스티벌", "연극", "뮤지컬", "전시", "공연", "콘서트"];
 
   // 로그인 모달 열기
   const openLoginModal = () => {
@@ -30,17 +30,23 @@ function MainPage() {
       setFormModal(true);
     }
   };
+
   const sortByView = () => {};
   const sortByLike = () => {};
   const sortByComment = () => {};
+
   return (
     <MainPageWrapper>
       <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <LeftContainer>
         <MenuBar>
-          {category.map((item) => {
-            return <p>{item}</p>;
+          {categories.map((category) => {
+            return (
+              <p key={category} onClick={() => setCategory(category)}>
+                {category}
+              </p>
+            );
           })}
         </MenuBar>
       </LeftContainer>
@@ -53,7 +59,7 @@ function MainPage() {
           <SortButton>댓글순</SortButton>
         </SortSection>
         <CardSection>
-          <NewsCardContainer />
+          <NewsCardContainer category={category} />
         </CardSection>
       </RightContainer>
     </MainPageWrapper>
@@ -70,11 +76,12 @@ const LeftContainer = styled.div`
   text-align: center;
 `;
 const MenuBar = styled.div`
-  width: 100px;
+  width: 80px;
   height: 500px;
   top: 200px;
   border: 1px solid black;
   position: fixed;
+  /* margin: 20px; */
 `;
 const RightContainer = styled.div`
   display: grid;

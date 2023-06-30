@@ -13,7 +13,7 @@ function Form({ formModal, setFormModal }) {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [downloadURL, setDownloadURL] = useState("");
-  const state = useSelector((state) => state.auth.user);
+  const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
 
@@ -28,7 +28,7 @@ function Form({ formModal, setFormModal }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile.name}`);
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile}`);
     await uploadBytes(imageRef, selectedFile);
 
     const fileURL = await getDownloadURL(imageRef);
@@ -47,8 +47,9 @@ function Form({ formModal, setFormModal }) {
         body: body,
         createdAt: new Date().toString(),
         isModified: false,
-        uid: state.uid,
         fileURL: fileURL,
+        uid: user.uid,
+        writer: user.displayName,
       };
       await addDoc(collection(db, "todos"), data);
       await setDoc(doc(db, "likes", data.id), {
@@ -126,8 +127,6 @@ function Form({ formModal, setFormModal }) {
   );
 }
 
-export default Form;
-
 const StModalBox = styled.div`
   position: fixed;
   top: 0;
@@ -148,3 +147,5 @@ const StModalContent = styled.div`
   height: 50%;
   border-radius: 12px;
 `;
+
+export default Form;
