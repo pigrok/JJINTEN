@@ -11,6 +11,7 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
   const [checkpassword, setCheckPassword] = useState("");
   const [name, setName] = useState("");
   const [caution, setCaution] = useState("");
+  const [isCheckingBox, setIsCheckingBox] = useState(false);
   const dispatch = useDispatch();
 
   const onChangeHandler = (event) => {
@@ -31,6 +32,15 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
     }
   };
 
+  // 필수 체크
+  const onchangeCheckBox = (event) => {
+    if (event.target.checked) {
+      setIsCheckingBox(true);
+    } else {
+      setIsCheckingBox(false);
+    }
+  };
+
   // 뒤로가기 버튼
   const backButtonHandler = () => {
     setSignUpModal(false);
@@ -40,8 +50,13 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
   // 회원가입 버튼
   const signUpButtonHandler = async (event) => {
     event.preventDefault();
-    // if (email && password && checkpassword && !name) {
-    //   alert("닉네임도 입력해라-_-");
+    if (email && password && checkpassword && !name) {
+      alert("닉네임도 입력해라-_-");
+      return;
+    }
+    // if (!isCheckingBox) {
+    //   alert("개인 정보 수집에 동의 부탁드려욤");
+    //   return;
     // }
     try {
       // 여기서 비동기 처리
@@ -103,8 +118,14 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
               </div>
             </main>
             <sub>
-              <div>개인정보 동의</div>
-              <div>마케팅 동의</div>
+              <div>
+                <input type="checkbox" onClick={onchangeCheckBox} /> <span>[필수] 개인 정보 수집</span>
+                <div style={{ width: "300px", height: "50px" }}>찐텐에 회원가입 신청하시는 당신의 정보 좀 수집할게요. 1개월 뒤에 삭제 해드립니다. ^_-</div>
+              </div>
+              <div>
+                <input type="checkbox" /> <span>[선택] 찐텐 이용약관</span>
+                <div style={{ width: "300px", height: "50px" }}>찐텐으로 즐길 사람만 모십니다. 아니면 어쩔 수 없구요. 여러분의 선택입니다. ^-^</div>
+              </div>
             </sub>
             <button onClick={signUpButtonHandler}>회원가입</button>
           </StModalContent>
@@ -117,6 +138,7 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
 }
 
 const StModalBox = styled.div`
+  z-index: 1;
   position: fixed;
   top: 0;
   left: 0;

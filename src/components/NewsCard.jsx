@@ -1,9 +1,10 @@
 import React from "react";
 import { styled } from "styled-components";
+import logoPic from "../assets/logo_nuki.png";
 import testImage1 from "../assets/random1000/test (1).png";
 import { useSelector } from "react-redux";
 
-function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isModified, updatedAt }) {
+function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isModified, updatedAt, fileURL }) {
   const user = useSelector((state) => state.auth.user);
 
   const cardOnClick = () => {
@@ -35,7 +36,7 @@ function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isMod
             <Category>{category}</Category>
             {isModified ? <Modified>(수정됨)</Modified> : <></>}
           </div>
-          <NewsCardImage src={testImage1}></NewsCardImage>
+          <NewsCardImage src={fileURL ? fileURL : logoPic}></NewsCardImage>
         </ImgBox>
         <NewCardInfoSection>
           <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by: {writer}</NewsEmojiInfos>

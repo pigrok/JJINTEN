@@ -64,6 +64,7 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
     setSignUpModal(true);
   };
 
+  // 구글로그인
   const handleGoogleLogin = async (e) => {
     e.preventDefault();
 
@@ -92,6 +93,8 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
       alert("로그인 실패 >_^");
     }
   };
+
+  // 깃헙 로그인
   const handleGithubLogin = async (e) => {
     e.preventDefault();
 

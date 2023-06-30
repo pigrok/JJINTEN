@@ -8,14 +8,23 @@ import { like, unlike, fetchLike } from "../redux/modules/like";
 import { db } from "../firebase";
 import { deleteTodo, setTodos, updateTodo } from "../redux/modules/todos";
 import { addComments, setComments } from "../redux/modules/comments";
+import Login from "../components/Login";
+import Signup from "../components/Signup";
+import { auth, storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Link } from "react-router-dom";
 
 function Detail() {
+  // 로그인 및 회원가입 모달 띄우기
+  const [loginModal, setLoginModal] = useState(false);
+  const [signUpModal, setSignUpModal] = useState(false);
+
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
 
   const likeNumber = useSelector((state) => state.like);
+
   // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -116,6 +125,7 @@ function Detail() {
           body: body,
           updatedAt: new Date().toString(),
           isModified: true,
+          fileURL: todo.fileURL,
         };
         await updateDoc(docRef, updatedData);
         const updatedTodo = { ...todo, ...updatedData };
@@ -152,7 +162,9 @@ function Detail() {
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
 
-    if (!contents) {
+    if (!user) {
+      setLoginModal(true);
+    } else if (!contents) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
     }
@@ -217,8 +229,37 @@ function Detail() {
     }
   };
 
+  // 사진 업로드
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // 사진 수정
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("파일을 선택해주세요.");
+      return;
+    }
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile.name}`);
+    await uploadBytes(imageRef, selectedFile);
+
+    const downloadURL = await getDownloadURL(imageRef);
+
+    const updatedTodo = { ...todo, fileURL: downloadURL };
+    dispatch(updateTodo(updatedTodo));
+
+    // 기존 코드 유지
+    setSelectedFile(null);
+    setFileURL(null);
+  };
+
   return (
     <div>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(todo)}</div>
@@ -256,6 +297,15 @@ function Detail() {
         <div style={{ border: "1px solid black", marginTop: "20px", height: "400px" }}>
           <p>body: {todo?.body}</p>
           {edit && <textarea value={body} onChange={(e) => setBody(e.target.value)} />}
+          {/* 파일 업로드 */}
+          {todo.fileURL && <img style={{ width: "300px", height: "300px" }} src={todo.fileURL} />}
+          {/* 파일 수정 */}
+          {edit && (
+            <div>
+              <input type="file" onChange={handleFileSelect} />
+              <button onClick={handleUpload}>Upload</button>
+            </div>
+          )}
         </div>
       </div>
       <div>

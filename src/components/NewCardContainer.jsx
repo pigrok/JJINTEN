@@ -71,6 +71,7 @@ function NewsCardContainer({ category }) {
             writer={todo.writer}
             updatedAt={todo.updatedAt}
             isModified={todo.isModified}
+            fileURL={todo.fileURL}
           />
         );
       })}

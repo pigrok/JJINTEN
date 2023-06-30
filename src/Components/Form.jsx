@@ -5,17 +5,34 @@ import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
 import { addTodo } from "../redux/modules/todos";
 import { styled } from "styled-components";
+import { auth, storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function Form({ formModal, setFormModal }) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [downloadURL, setDownloadURL] = useState("");
   const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
 
+  // 사진 업로드
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // 입력
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile}`);
+    await uploadBytes(imageRef, selectedFile);
+
+    const fileURL = await getDownloadURL(imageRef);
+    setDownloadURL(fileURL);
 
     if (!title || !body || !category) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
@@ -30,6 +47,7 @@ function Form({ formModal, setFormModal }) {
         body: body,
         createdAt: new Date().toString(),
         isModified: false,
+        fileURL: fileURL,
         uid: user.uid,
         writer: user.displayName,
       };
@@ -94,9 +112,12 @@ function Form({ formModal, setFormModal }) {
                   }}
                 ></input>
               </div>
+              <div>
+                <input type="file" onChange={handleFileSelect} />
+              </div>
               <button type="submit">작성</button>
+              <button onClick={cancelButtonHandler}>취소</button>
             </form>
-            <button onClick={cancelButtonHandler}>취소</button>
           </StModalContent>
         </StModalBox>
       ) : (
