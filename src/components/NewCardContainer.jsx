@@ -1,36 +1,25 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import NewsCard from "./NewsCard";
 import { styled } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setPosts } from "../redux/modules/posts";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
-function NewsCardContainer() {
-  const NewsCardContinerWrapper = styled.div`
-    display: grid;
-    @media screen and (min-width: 520px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    @media screen and (min-width: 780px) {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    @media screen and (min-width: 1060px) {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  `;
 
+function NewsCardContainer({ category }) {
   const posts = useSelector((state) => {
     return state.posts;
   });
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "posts"));
+        const q = query(collection(db, "posts"), category === "전체" ? "" : where("category", "==", category));
+        const querySnapshot = await getDocs(q);
+
         const posts = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt;
@@ -43,7 +32,7 @@ function NewsCardContainer() {
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, category]);
 
   useEffect(() => {
     dispatch(setPosts(posts));
@@ -74,17 +63,32 @@ function NewsCardContainer() {
           <NewsCard
             key={post.id}
             onClickFunc={() => navigateClick(post.id)}
-            createdAt={post.createdAt}
             category={post.category}
             title={post.title}
             body={post.body}
+            writer={post.writer}
             updatedAt={post.updatedAt}
+            createdAt={post.createdAt}
             isModified={post.isModified}
+            fileURL={post.fileURL}
           />
         );
       })}
     </NewsCardContinerWrapper>
   );
 }
+
+const NewsCardContinerWrapper = styled.div`
+  display: grid;
+  @media screen and (min-width: 520px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media screen and (min-width: 780px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media screen and (min-width: 1060px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
 
 export default NewsCardContainer;

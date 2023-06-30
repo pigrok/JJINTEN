@@ -6,7 +6,7 @@ import storage from "redux-persist/lib/storage";
 import authReducer from "../modules/auth";
 import posts from "../modules/posts";
 import comments from "../modules/comments";
-// import thunk from "redux-thunk";
+import likeReducer from "../modules/like";
 
 // Redux Persist 구성
 const persistConfig = {
@@ -18,6 +18,7 @@ const rootReducer = combineReducers({
   // 여기에 modules
   auth: authReducer,
   posts,
+  like: likeReducer,
   comments,
 });
 

@@ -1,23 +1,42 @@
+<<<<<<< HEAD
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+=======
+import { addDoc, collection, setDoc, doc } from "firebase/firestore";
+>>>>>>> 8067bcf6f2d57d4653728eb92dfeaeb2a7dcc60a
 import { db } from "../firebase";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
 import { addPost } from "../redux/modules/posts";
 import { styled } from "styled-components";
+import { auth, storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function Form({ formModal, setFormModal }) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const state = useSelector((state) => state.auth.user);
-
-  console.log(state);
+  const [downloadURL, setDownloadURL] = useState("");
+  const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
 
+  // 사진 업로드
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // 입력
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile}`);
+    await uploadBytes(imageRef, selectedFile);
+
+    const fileURL = await getDownloadURL(imageRef);
+    setDownloadURL(fileURL);
 
     if (!title || !body || !category) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
@@ -32,15 +51,25 @@ function Form({ formModal, setFormModal }) {
         body: body,
         createdAt: new Date().toString(),
         isModified: false,
-        uid: state.uid,
+        fileURL: fileURL,
+        uid: user.uid,
+        writer: user.displayName,
       };
+<<<<<<< HEAD
       await addDoc(collection(db, "posts"), data);
+=======
+      await addDoc(collection(db, "todos"), data);
+>>>>>>> 8067bcf6f2d57d4653728eb92dfeaeb2a7dcc60a
       await setDoc(doc(db, "likes", data.id), {
         likeNumber: 0,
         likePeople: [],
       });
+<<<<<<< HEAD
 
       dispatch(addPost(data));
+=======
+      dispatch(addTodo(data));
+>>>>>>> 8067bcf6f2d57d4653728eb92dfeaeb2a7dcc60a
       // 입력 필드 초기화
       setCategory("");
       setTitle("");
@@ -96,9 +125,12 @@ function Form({ formModal, setFormModal }) {
                   }}
                 ></input>
               </div>
+              <div>
+                <input type="file" onChange={handleFileSelect} />
+              </div>
               <button type="submit">작성</button>
+              <button onClick={cancelButtonHandler}>취소</button>
             </form>
-            <button onClick={cancelButtonHandler}>취소</button>
           </StModalContent>
         </StModalBox>
       ) : (
@@ -107,8 +139,6 @@ function Form({ formModal, setFormModal }) {
     </>
   );
 }
-
-export default Form;
 
 const StModalBox = styled.div`
   position: fixed;
@@ -130,3 +160,5 @@ const StModalContent = styled.div`
   height: 50%;
   border-radius: 12px;
 `;
+
+export default Form;

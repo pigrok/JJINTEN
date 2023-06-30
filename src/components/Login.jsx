@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { loginSuccess, loginFailure } from "../redux/modules/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
-
+import { signInWithGoogle, signInWithGithub } from "../firebase";
 function Login({ loginModal, setSignUpModal, setLoginModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,6 +36,8 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
+          note: null,
+          lastSignTime: user.metadata.lastSignInTime,
         })
       );
       alert("로그인 성공 ^_-");
@@ -62,6 +64,66 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
     setSignUpModal(true);
   };
 
+  // 구글로그인
+  const handleGoogleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const userCredential = await signInWithGoogle();
+      const user = userCredential.user;
+      dispatch(
+        loginSuccess({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          note: null,
+          lastSignTime: user.metadata.lastSignInTime,
+        })
+      );
+      alert("로그인 성공 ^_-");
+      setLoginModal(false);
+    } catch (error) {
+      const errorMessage = error.message;
+      dispatch(
+        loginFailure({
+          error: errorMessage,
+        })
+      );
+      alert("로그인 실패 >_^");
+    }
+  };
+
+  // 깃헙 로그인
+  const handleGithubLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const userCredential = await signInWithGithub();
+      const user = userCredential.user;
+      dispatch(
+        loginSuccess({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          note: null,
+          lastSignTime: user.metadata.lastSignInTime,
+        })
+      );
+      alert("로그인 성공 ^_-");
+      setLoginModal(false);
+    } catch (error) {
+      const errorMessage = error.message;
+      console.log(errorMessage);
+      dispatch(
+        loginFailure({
+          error: errorMessage,
+        })
+      );
+      alert("로그인 실패 >_^");
+    }
+  };
   return (
     <>
       {loginModal ? (
@@ -92,8 +154,8 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
             </sub>
             <sub>
               <div>소셜로 가입하기</div>
-              <button>구글</button>
-              <button>깃헙</button>
+              <button onClick={handleGoogleLogin}>구글</button>
+              <button onClick={handleGithubLogin}>깃헙</button>
             </sub>
           </StModalContent>
         </StModalBox>
@@ -103,8 +165,6 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
     </>
   );
 }
-
-export default Login;
 
 const StModalBox = styled.div`
   position: fixed;
@@ -127,3 +187,5 @@ const StModalContent = styled.div`
   height: 50%;
   border-radius: 12px;
 `;
+
+export default Login;

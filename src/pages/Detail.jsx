@@ -1,22 +1,41 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, getDoc, addDoc } from "firebase/firestore";
+import shortid from "shortid";
+import { likeDB, unLikeDB, fetchLikeDB, didIPressed } from "../util/like";
+import { like, unlike, fetchLike } from "../redux/modules/like";
+import { db } from "../firebase";
+import { deletePost, setPosts, updatePost } from "../redux/modules/posts";
+import { addComments, setComments } from "../redux/modules/comments";
 import { deletePost, setPosts, updatePost } from "../redux/modules/posts";
 import { addDoc, collection, deleteDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { addComments, setComments } from "../redux/modules/comments";
+import Login from "../components/Login";
+import Signup from "../components/Signup";
+import { auth, storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import shortid from "shortid";
 import Comment from "../components/Comment";
 
 function Detail() {
+  // 로그인 및 회원가입 모달 띄우기
+  const [loginModal, setLoginModal] = useState(false);
+  const [signUpModal, setSignUpModal] = useState(false);
+
   const posts = useSelector((state) => state.posts);
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
 
+  const likeNumber = useSelector((state) => state.like);
+
+  // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [edit, setEdit] = useState(false);
   const [name, setName] = useState("");
+  const [isLike, setIsLike] = useState(false);
   const [contents, setContents] = useState("");
   const [category, setCategory] = useState("");
 
@@ -27,6 +46,11 @@ function Detail() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    async function fetchLikeAsync() {
+      const fetchedlike = await fetchLikeDB(id);
+      dispatch(fetchLike(fetchedlike.likeNumber));
+      setIsLike(didIPressed(fetchedlike.likePeople, user ? user.uid : null));
+    }
     const fetchData = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "posts"));
@@ -40,7 +64,7 @@ function Detail() {
         console.log(error);
       }
     };
-
+    fetchLikeAsync();
     fetchData();
   }, [dispatch]);
 
@@ -57,7 +81,7 @@ function Detail() {
           const data = doc.data();
           return { ...data };
         });
-        console.log(comments);
+        // console.log(comments);
         dispatch(setComments(comments));
       } catch (error) {
         console.log(error);
@@ -121,6 +145,7 @@ function Detail() {
           body: body,
           updatedAt: new Date().toString(),
           isModified: true,
+          fileURL: post.fileURL,
         };
         await updateDoc(docRef, updatedData);
         const updatedPost = { ...post, ...updatedData };
@@ -134,10 +159,32 @@ function Detail() {
     }
   };
 
+  const onClickLike = async (e) => {
+    e.preventDefault();
+    if (!user) return;
+    const userId = user.uid;
+    const postId = id;
+    if (likeDB(userId, postId)) {
+      dispatch(like());
+      setIsLike(!isLike);
+    }
+  };
+  const onClickUnLike = async (e) => {
+    e.preventDefault();
+    if (!user) return;
+    const userId = user.uid;
+    const postId = id;
+    if (unLikeDB(userId, postId)) {
+      dispatch(unlike());
+      setIsLike(!isLike);
+    }
+  };
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
 
-    if (!contents) {
+    if (!user) {
+      setLoginModal(true);
+    } else if (!contents) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
     }
@@ -191,10 +238,39 @@ function Detail() {
     }
   };
 
+  // 사진 업로드
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // 사진 수정
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("파일을 선택해주세요.");
+      return;
+    }
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile.name}`);
+    await uploadBytes(imageRef, selectedFile);
+
+    const downloadURL = await getDownloadURL(imageRef);
+
+    const updatedpost = { ...post, fileURL: downloadURL };
+    dispatch(updatePost(updatedPost));
+
+    // 기존 코드 유지
+    setSelectedFile(null);
+    setFileURL(null);
+  };
+
   const isPostCreatedByCurrentUser = user && post && user.uid === post.uid;
 
   return (
     <div>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(post)}</div>
@@ -246,6 +322,15 @@ function Detail() {
         <div style={{ border: "1px solid black", marginTop: "20px", height: "400px" }}>
           <p>body: {post?.body}</p>
           {edit && <textarea value={body} onChange={(e) => setBody(e.target.value)} />}
+          {/* 파일 업로드 */}
+          {post.fileURL && <img style={{ width: "300px", height: "300px" }} src={post.fileURL} />}
+          {/* 파일 수정 */}
+          {edit && (
+            <div>
+              <input type="file" onChange={handleFileSelect} />
+              <button onClick={handleUpload}>Upload</button>
+            </div>
+          )}
         </div>
       </div>
 

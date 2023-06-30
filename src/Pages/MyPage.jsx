@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import { signOut, updateProfile } from "firebase/auth";
 import FileUpload from "../components/FileUpload";
 import MyPost from "../components/MyPost";
-import { logOutSuccess, updateDisplayName } from "../redux/modules/auth";
+import { logOutSuccess, updateDisplayName, updateProfileNote } from "../redux/modules/auth";
 import { styled } from "styled-components";
 
 const MyPage = () => {
-  const state = useSelector((state) => state.auth.user);
-  const [isOpen, setIsOpen] = useState(false);
+  const user = useSelector((state) => state.auth.user);
+  const [edit, setEdit] = useState(false); // 수정 토글
   const [newDisplayName, setNewDisplayName] = useState("");
   const [note, SetNote] = useState("");
 
@@ -38,21 +38,28 @@ const MyPage = () => {
     }
   };
 
-  const onSubmitNote = (event) => {
-    event.preventDefault();
+  // 수정 버튼 토글
+  const editToggle = () => {
+    setEdit((prev) => !prev);
   };
 
-  const onSubmitDisName = (event) => {
+  // 프로필 수정 핸들러
+  const profileEditHandler = (event) => {
     event.preventDefault();
+    if (newDisplayName && note) {
+      dispatch(updateProfileNote(note));
 
-    // 기존 닉네임과 변경할 닉네임이 다를 때만 실행
-    if (state.displayName !== newDisplayName) {
-      updateName();
-      setNewDisplayName("");
+      // 기존 닉네임과 변경할 닉네임이 다를 때만 실행
+      if (user.displayName !== newDisplayName) {
+        updateName();
+      }
+      setEdit(false);
+    } else {
+      alert("내용을 입력해주세요");
     }
   };
 
-  // 닉네임 업데이트
+  // 닉네임 업데이트 - Authentication
   const updateName = async (user) => {
     try {
       await updateProfile(auth.currentUser, {
@@ -65,77 +72,64 @@ const MyPage = () => {
     }
   };
 
-  const clickOpenCloseModal = () => setIsOpen((prev) => !prev);
+  // 시간 변형
+  const processCreatedAt = (dateString) => {
+    const date = new Date(Date.parse(dateString));
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hour = date.getHours().toString();
+    const minute = date.getMinutes().toString();
+    const formattedDate = `${year}년${month}월${day}일 ${hour}시${minute}분`;
+
+    return formattedDate;
+  };
 
   return (
-    <>
-      <main
-        style={{
-          border: "1px solid black",
-          margin: "10px",
-          padding: "10px",
-        }}
-      >
-        <button onClick={logOut}>로그아웃</button>
-        <p></p>
-        <button onClick={clickOpenCloseModal}>수정</button>
-        {isOpen && (
-          <ModalBox>
-            <ModalContents>
-              <button onClick={clickOpenCloseModal}>닫기</button>
-              <h2>프로필 수정</h2>
-              <form onSubmit={onSubmitDisName}>
-                <input value={newDisplayName} onChange={onChangeHandler} name="newDisplayName" type="text" placeholder="닉네임 변경"></input>
-                <input type="submit" value="Update DisplayName"></input>
-              </form>
-              <form onSubmit={onSubmitNote}>
-                <input value={note} onChange={onChangeHandler} name="note" type="text" placeholder="한 줄 소개 ..."></input>
-                <input type="submit" value="Update Note"></input>
-              </form>
-              <FileUpload />
-            </ModalContents>
-          </ModalBox>
-        )}
-        <h2>프로필</h2>
-        <ProfileContainer>
-          <ProfilePic src={state.photoURL} alt="Uploaded" />
-          <ProfileInfo>
-            <p>닉네임 : {state.displayName}</p>
-            <p>{state.email}</p>
-            <p>팔로우 ?????? </p>
-            <p>한 줄 소개 : {note}</p>
-          </ProfileInfo>
-        </ProfileContainer>
-
-        <h2>내가 작성한 게시글</h2>
-        <MyPost />
-        <h2>내가 좋아요한 게시글</h2>
-      </main>
-    </>
+    <main
+      style={{
+        border: "1px solid black",
+        margin: "10px",
+        padding: "10px",
+      }}
+    >
+      <button onClick={logOut}>로그아웃</button>
+      <p></p>
+      <button onClick={editToggle}>프로필 수정</button>
+      <ProfileContainer>
+        <div>
+          <ProfilePic src={user.photoURL} alt="Uploaded" />
+          {edit && <FileUpload edit={edit} setEdit={setEdit} />}
+        </div>
+        <ProfileInfo>
+          {edit ? (
+            <form>
+              닉네임 : <input value={newDisplayName} onChange={onChangeHandler} name="newDisplayName" type="text" placeholder="닉네임 ..." autoComplete="off"></input>
+              {/* <input type="submit" value="Update DisplayName"></input> */}
+            </form>
+          ) : (
+            <p>닉네임 : {user.displayName}</p>
+          )}
+          <p>이메일 : {user.email}</p>
+          {edit ? (
+            <form>
+              한 줄 소개 : <input value={note} onChange={onChangeHandler} name="note" type="text" placeholder="한 줄 소개 ..." autoComplete="off"></input>
+              {/* <input type="submit" value="Update Note"></input> */}
+              <br />
+              <button onClick={profileEditHandler}>저장</button>
+            </form>
+          ) : (
+            <p>한 줄 소개 : {user.note}</p>
+          )}
+          <p>마지막 로그인 시간 : {processCreatedAt(user.lastSignTime)}</p>
+        </ProfileInfo>
+      </ProfileContainer>
+      <h2>내가 작성한 게시글</h2>
+      <MyPost />
+      <h2>내가 좋아요한 게시글</h2>
+    </main>
   );
 };
-
-export default MyPage;
-
-const ModalBox = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #dededec9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const ModalContents = styled.div`
-  position: relative;
-  width: 40%;
-  height: 45%;
-  background-color: #ffffff;
-  border-radius: 15px;
-`;
 
 const ProfileContainer = styled.div`
   display: flex;
@@ -147,6 +141,7 @@ const ProfileContainer = styled.div`
 const ProfilePic = styled.img`
   width: 400px;
   height: 400px;
+  object-fit: cover;
   border-radius: 20px;
 `;
 
@@ -156,3 +151,5 @@ const ProfileInfo = styled.div`
   background-color: #dfdfdf;
   border-radius: 20px;
 `;
+
+export default MyPage;
