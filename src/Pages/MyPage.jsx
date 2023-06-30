@@ -106,7 +106,6 @@ const MyPage = () => {
             <p>한 줄 소개 : {note}</p>
           </ProfileInfo>
         </ProfileContainer>
-
         <h2>내가 작성한 게시글</h2>
         <MyPost />
         <h2>내가 좋아요한 게시글</h2>

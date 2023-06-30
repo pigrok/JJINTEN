@@ -80,6 +80,7 @@ function NewsCardContainer() {
             body={todo.body}
             updatedAt={todo.updatedAt}
             isModified={todo.isModified}
+            fileURL={todo.fileURL}
           />
         );
       })}

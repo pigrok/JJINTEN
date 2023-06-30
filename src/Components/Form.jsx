@@ -1,23 +1,38 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, setDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
 import { addTodo } from "../redux/modules/todos";
 import { styled } from "styled-components";
+import { auth, storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function Form({ formModal, setFormModal }) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [downloadURL, setDownloadURL] = useState("");
   const state = useSelector((state) => state.auth.user);
-
-  console.log(state);
 
   const dispatch = useDispatch();
 
+  // 사진 업로드
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // 입력
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile.name}`);
+    await uploadBytes(imageRef, selectedFile);
+
+    const fileURL = await getDownloadURL(imageRef);
+    setDownloadURL(fileURL);
 
     if (!title || !body || !category) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
@@ -33,8 +48,13 @@ function Form({ formModal, setFormModal }) {
         createdAt: new Date().toString(),
         isModified: false,
         uid: state.uid,
+        fileURL: fileURL,
       };
       await addDoc(collection(db, "todos"), data);
+      await setDoc(doc(db, "likes", data.id), {
+        likeNumber: 0,
+        likePeople: [],
+      });
       dispatch(addTodo(data));
       // 입력 필드 초기화
       setCategory("");
@@ -91,9 +111,12 @@ function Form({ formModal, setFormModal }) {
                   }}
                 ></input>
               </div>
+              <div>
+                <input type="file" onChange={handleFileSelect} />
+              </div>
               <button type="submit">작성</button>
+              <button onClick={cancelButtonHandler}>취소</button>
             </form>
-            <button onClick={cancelButtonHandler}>취소</button>
           </StModalContent>
         </StModalBox>
       ) : (

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { deleteTodo, setTodos, updateTodo } from "../redux/modules/todos";
-import { addDoc, collection, deleteDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { db } from "../firebase";
-import { addComments, setComments } from "../redux/modules/comments";
+import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, getDoc, addDoc } from "firebase/firestore";
 import shortid from "shortid";
+import { likeDB, unLikeDB, fetchLikeDB, didIPressed } from "../util/like";
+import { like, unlike, fetchLike } from "../redux/modules/like";
+import { db } from "../firebase";
+import { deleteTodo, setTodos, updateTodo } from "../redux/modules/todos";
+import { addComments, setComments } from "../redux/modules/comments";
 import Login from "../components/Login";
 import Signup from "../components/Signup";
+import { auth, storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 function Detail() {
   // 로그인 및 회원가입 모달 띄우기
@@ -17,11 +21,14 @@ function Detail() {
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
+  const likeNumber = useSelector((state) => state.like);
 
+  // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [edit, setEdit] = useState(false);
   const [name, setName] = useState("");
+  const [isLike, setIsLike] = useState(false);
   const [contents, setContents] = useState("");
 
   const { id } = useParams();
@@ -31,6 +38,11 @@ function Detail() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    async function fetchLikeAsync() {
+      const fetchedlike = await fetchLikeDB(id);
+      dispatch(fetchLike(fetchedlike.likeNumber));
+      setIsLike(didIPressed(fetchedlike.likePeople, user ? user.uid : null));
+    }
     const fetchData = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "todos"));
@@ -44,7 +56,7 @@ function Detail() {
         console.log(error);
       }
     };
-
+    fetchLikeAsync();
     fetchData();
   }, [dispatch]);
 
@@ -111,6 +123,7 @@ function Detail() {
           body: body,
           updatedAt: new Date().toString(),
           isModified: true,
+          fileURL: todo.fileURL,
         };
         await updateDoc(docRef, updatedData);
         const updatedTodo = { ...todo, ...updatedData };
@@ -124,6 +137,24 @@ function Detail() {
     }
   };
 
+  const onClickLike = async (e) => {
+    e.preventDefault();
+    const userId = user.uid;
+    const todoId = id;
+    if (likeDB(userId, todoId)) {
+      dispatch(like());
+      setIsLike(!isLike);
+    }
+  };
+  const onClickUnLike = async (e) => {
+    e.preventDefault();
+    const userId = user.uid;
+    const todoId = id;
+    if (unLikeDB(userId, todoId)) {
+      dispatch(unlike());
+      setIsLike(!isLike);
+    }
+  };
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
 
@@ -194,14 +225,32 @@ function Detail() {
     }
   };
 
-  // 로그인 상태면 작성, 로그인 안 한 상태면 로그인 모달창 띄우기
-  // const writeCommentButtonHandler = () => {
-  //   if (!user) {
-  //     setLoginModal(true);
-  //   } else {
-  //     handleCommentSubmit();
-  //   }
-  // };
+  // 사진 업로드
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // 사진 수정
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("파일을 선택해주세요.");
+      return;
+    }
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile.name}`);
+    await uploadBytes(imageRef, selectedFile);
+
+    const downloadURL = await getDownloadURL(imageRef);
+
+    const updatedTodo = { ...todo, fileURL: downloadURL };
+    dispatch(updateTodo(updatedTodo));
+
+    // 기존 코드 유지
+    setSelectedFile(null);
+    setFileURL(null);
+  };
 
   return (
     <div>
@@ -224,6 +273,20 @@ function Detail() {
             <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodoHandler}>
               삭제
             </button>
+            {isLike ? (
+              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={onClickUnLike}>
+                ㄴㄴㄴ
+              </button>
+            ) : (
+              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={onClickLike}>
+                좋아요
+              </button>
+            )}
+
+            <span>{likeNumber}</span>
+            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => navigate("/")}>
+              이전 화면으로
+            </button>
           </div>
         </div>
       </div>
@@ -235,6 +298,15 @@ function Detail() {
         <div style={{ border: "1px solid black", marginTop: "20px", height: "400px" }}>
           <p>body: {todo?.body}</p>
           {edit && <textarea value={body} onChange={(e) => setBody(e.target.value)} />}
+          {/* 파일 업로드 */}
+          {todo.fileURL && <img style={{ width: "300px", height: "300px" }} src={todo.fileURL} />}
+          {/* 파일 수정 */}
+          {edit && (
+            <div>
+              <input type="file" onChange={handleFileSelect} />
+              <button onClick={handleUpload}>Upload</button>
+            </div>
+          )}
         </div>
       </div>
       <div>

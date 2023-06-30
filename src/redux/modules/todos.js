@@ -2,6 +2,7 @@ const ADD_TODO = "todos/ADD_TODO";
 const DELETE_TODO = "todos/DELETE_TODO";
 const UPDATE_TODO = "todos/UPDATE_TODO";
 const SET_TODOS = "todos/SET_TODOS";
+const UPLOAD_FILE = "todos/UPLOAD_FILE";
 
 export const addTodo = (todo) => ({
   type: ADD_TODO,
@@ -41,6 +42,9 @@ const todos = (state = initialState, action) => {
       return state.map((todo) => (todo.id === action.payload.id ? action.payload : todo));
 
     case SET_TODOS:
+      return action.payload;
+
+    case UPLOAD_FILE:
       return action.payload;
 
     default:

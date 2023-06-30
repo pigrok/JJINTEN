@@ -33,13 +33,13 @@ function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
   };
 
   // 필수 체크
-  // const onchangeCheckBox = (event) => {
-  //   if (event.target.checked) {
-  //     setIsCheckingBox(true);
-  //   } else {
-  //     setIsCheckingBox(false);
-  //   }
-  // };
+  const onchangeCheckBox = (event) => {
+    if (event.target.checked) {
+      setIsCheckingBox(true);
+    } else {
+      setIsCheckingBox(false);
+    }
+  };
 
   // 뒤로가기 버튼
   const backButtonHandler = () => {

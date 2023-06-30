@@ -1,8 +1,8 @@
 import React from "react";
 import { styled } from "styled-components";
-import testImage1 from "../assets/random1000/test (1).png";
+import logoPic from "../assets/logo_nuki.png";
 
-function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModified, updatedAt }) {
+function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModified, updatedAt, fileURL }) {
   const SNewsCard = styled.div`
     margin: 0;
     background-color: rgba(255, 255, 255, 0);
@@ -107,7 +107,7 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModifi
             <Category>{category}</Category>
             {isModified ? <Modified>(수정됨)</Modified> : <></>}
           </div>
-          <NewsCardImage src={testImage1}></NewsCardImage>
+          <NewsCardImage src={fileURL ? fileURL : logoPic}></NewsCardImage>
         </ImgBox>
         <NewCardInfoSection>
           <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by:무함마드알콰리즈미</NewsEmojiInfos>
@@ -116,7 +116,7 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModifi
           <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
           <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:93201</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>32432개의 댓글</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:30999</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:</NewsEmojiInfos>
         </NewCardInfoSection>
       </SNewsCard>
     </>
