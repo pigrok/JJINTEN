@@ -3,13 +3,13 @@ import NewsCard from "./NewsCard";
 import { styled } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setTodos } from "../redux/modules/todos";
+import { setPosts } from "../redux/modules/posts";
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
 
 function NewsCardContainer({ category }) {
-  const todos = useSelector((state) => {
-    return state.todos;
+  const posts = useSelector((state) => {
+    return state.posts;
   });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,16 +17,15 @@ function NewsCardContainer({ category }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const q = query(collection(db, "todos"), category === "전체" ? "" : where("category", "==", category));
+        const q = query(collection(db, "posts"), category === "전체" ? "" : where("category", "==", category));
         const querySnapshot = await getDocs(q);
 
-        const todos = querySnapshot.docs.map((doc) => {
+        const posts = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt;
           return { id: doc.id, ...data, createdAt };
         });
-        dispatch(setTodos(todos));
-        console.log(todos);
+        dispatch(setPosts(posts));
       } catch (error) {
         console.log(error);
       }
@@ -36,11 +35,11 @@ function NewsCardContainer({ category }) {
   }, [dispatch, category]);
 
   useEffect(() => {
-    dispatch(setTodos(todos));
-  }, [dispatch, todos]);
+    dispatch(setPosts(posts));
+  }, [dispatch, posts]);
 
-  const navigateClick = (todoId) => {
-    navigate(`/${todoId}`);
+  const navigateClick = (postId) => {
+    navigate(`/${postId}`);
   };
 
   const compareDateCard = (a, b) => {
@@ -49,29 +48,29 @@ function NewsCardContainer({ category }) {
     return bDate - aDate;
   };
 
-  const modifiedDateCard = (todo) => {
-    if (todo.isModified) {
-      return todo.updatedAt;
+  const modifiedDateCard = (post) => {
+    if (post.isModified) {
+      return post.updatedAt;
     } else {
-      return todo.createdAt;
+      return post.createdAt;
     }
   };
 
   return (
     <NewsCardContinerWrapper>
-      {todos.sort(compareDateCard).map((todo) => {
+      {posts.sort(compareDateCard).map((post) => {
         return (
           <NewsCard
-            key={todo.id}
-            onClickFunc={() => navigateClick(todo.id)}
-            createdAt={todo.createdAt}
-            category={todo.category}
-            title={todo.title}
-            body={todo.body}
-            writer={todo.writer}
-            updatedAt={todo.updatedAt}
-            isModified={todo.isModified}
-            fileURL={todo.fileURL}
+            key={post.id}
+            onClickFunc={() => navigateClick(post.id)}
+            category={post.category}
+            title={post.title}
+            body={post.body}
+            writer={post.writer}
+            updatedAt={post.updatedAt}
+            createdAt={post.createdAt}
+            isModified={post.isModified}
+            fileURL={post.fileURL}
           />
         );
       })}

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import NewsCardContainer from "../components/NewCardContainer";
 import { useSelector } from "react-redux";
 import Login from "../components/Login";
-import Signup from "../components/Signup";
+import SignUp from "../components/SignUp";
 import Form from "../components/Form";
 import Button from "../components/Button";
 
@@ -37,7 +37,7 @@ function MainPage() {
 
   return (
     <MainPageWrapper>
-      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <LeftContainer>
         <MenuBar>
