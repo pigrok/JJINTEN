@@ -8,15 +8,11 @@ import { like, unlike, fetchLike } from "../redux/modules/like";
 import { db } from "../firebase";
 import { deletePost, setPosts, updatePost } from "../redux/modules/posts";
 import { addComments, setComments } from "../redux/modules/comments";
-import { deletePost, setPosts, updatePost } from "../redux/modules/posts";
-import { addDoc, collection, deleteDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { db } from "../firebase";
-import { addComments, setComments } from "../redux/modules/comments";
+
 import Login from "../components/Login";
-import Signup from "../components/Signup";
+import SignUp from "../components/SignUp";
 import { auth, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import shortid from "shortid";
 import Comment from "../components/Comment";
 
 function Detail() {
@@ -257,7 +253,7 @@ function Detail() {
 
     const downloadURL = await getDownloadURL(imageRef);
 
-    const updatedpost = { ...post, fileURL: downloadURL };
+    const updatedPost = { ...post, fileURL: downloadURL };
     dispatch(updatePost(updatedPost));
 
     // 기존 코드 유지
@@ -270,7 +266,7 @@ function Detail() {
   return (
     <div>
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(post)}</div>

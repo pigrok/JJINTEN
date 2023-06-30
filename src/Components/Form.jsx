@@ -1,16 +1,11 @@
-<<<<<<< HEAD
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
-=======
-import { addDoc, collection, setDoc, doc } from "firebase/firestore";
->>>>>>> 8067bcf6f2d57d4653728eb92dfeaeb2a7dcc60a
-import { db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
 import { addPost } from "../redux/modules/posts";
 import { styled } from "styled-components";
-import { auth, storage } from "../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 function Form({ formModal, setFormModal }) {
   const [category, setCategory] = useState("");
@@ -18,6 +13,8 @@ function Form({ formModal, setFormModal }) {
   const [body, setBody] = useState("");
   const [downloadURL, setDownloadURL] = useState("");
   const user = useSelector((state) => state.auth.user);
+
+  const state = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
 
@@ -28,7 +25,6 @@ function Form({ formModal, setFormModal }) {
     setSelectedFile(event.target.files[0]);
   };
 
-  // 입력
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -52,24 +48,17 @@ function Form({ formModal, setFormModal }) {
         createdAt: new Date().toString(),
         isModified: false,
         fileURL: fileURL,
-        uid: user.uid,
-        writer: user.displayName,
+        uid: state.uid,
+        likeNumber: 0,
+        likePeople: [],
       };
-<<<<<<< HEAD
       await addDoc(collection(db, "posts"), data);
-=======
-      await addDoc(collection(db, "todos"), data);
->>>>>>> 8067bcf6f2d57d4653728eb92dfeaeb2a7dcc60a
       await setDoc(doc(db, "likes", data.id), {
         likeNumber: 0,
         likePeople: [],
       });
-<<<<<<< HEAD
 
       dispatch(addPost(data));
-=======
-      dispatch(addTodo(data));
->>>>>>> 8067bcf6f2d57d4653728eb92dfeaeb2a7dcc60a
       // 입력 필드 초기화
       setCategory("");
       setTitle("");
@@ -129,8 +118,8 @@ function Form({ formModal, setFormModal }) {
                 <input type="file" onChange={handleFileSelect} />
               </div>
               <button type="submit">작성</button>
-              <button onClick={cancelButtonHandler}>취소</button>
             </form>
+            <button onClick={cancelButtonHandler}>취소</button>
           </StModalContent>
         </StModalBox>
       ) : (
@@ -139,6 +128,8 @@ function Form({ formModal, setFormModal }) {
     </>
   );
 }
+
+export default Form;
 
 const StModalBox = styled.div`
   position: fixed;
@@ -160,5 +151,3 @@ const StModalContent = styled.div`
   height: 50%;
   border-radius: 12px;
 `;
-
-export default Form;

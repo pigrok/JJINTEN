@@ -4,7 +4,7 @@ import logoPic from "../assets/logo_nuki.png";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Login from "./Login";
-import Signup from "./Signup";
+import SignUp from "./SignUp";
 
 function Header() {
   const state = useSelector((state) => state.auth);
@@ -33,7 +33,7 @@ function Header() {
   return (
     <HeaderWrapper>
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <HeaderContainer>
         <LeftSection onClick={clickToMainPage}>
           <ImgBox>
