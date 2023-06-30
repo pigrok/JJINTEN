@@ -1,49 +1,39 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import NewsCard from "./NewsCard";
 import { styled } from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setTodos } from "../redux/modules/todos";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../firebase";
-function NewsCardContainer() {
-  const NewsCardContinerWrapper = styled.div`
-    display: grid;
-    @media screen and (min-width: 520px) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    @media screen and (min-width: 780px) {
-      grid-template-columns: repeat(3, 1fr);
-    }
-    @media screen and (min-width: 1060px) {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  `;
 
+function NewsCardContainer({ category }) {
   const todos = useSelector((state) => {
     return state.todos;
   });
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "todos"));
+        const q = query(collection(db, "todos"), category === "전체" ? "" : where("category", "==", category));
+        const querySnapshot = await getDocs(q);
+
         const todos = querySnapshot.docs.map((doc) => {
           const data = doc.data();
           const createdAt = data.createdAt;
           return { id: doc.id, ...data, createdAt };
         });
         dispatch(setTodos(todos));
+        console.log(todos);
       } catch (error) {
         console.log(error);
       }
     };
 
     fetchData();
-  }, [dispatch]);
+  }, [dispatch, category]);
 
   useEffect(() => {
     dispatch(setTodos(todos));
@@ -87,5 +77,18 @@ function NewsCardContainer() {
     </NewsCardContinerWrapper>
   );
 }
+
+const NewsCardContinerWrapper = styled.div`
+  display: grid;
+  @media screen and (min-width: 520px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media screen and (min-width: 780px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media screen and (min-width: 1060px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
 
 export default NewsCardContainer;

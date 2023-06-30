@@ -106,8 +106,6 @@ function Form({ formModal, setFormModal }) {
   );
 }
 
-export default Form;
-
 const StModalBox = styled.div`
   position: fixed;
   top: 0;
@@ -128,3 +126,5 @@ const StModalContent = styled.div`
   height: 50%;
   border-radius: 12px;
 `;
+
+export default Form;

@@ -8,28 +8,24 @@ import { like, unlike, fetchLike } from "../redux/modules/like";
 import { db } from "../firebase";
 import { deleteTodo, setTodos, updateTodo } from "../redux/modules/todos";
 import { addComments, setComments } from "../redux/modules/comments";
+import { Link } from "react-router-dom";
 
 function Detail() {
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
 
-  console.log(user.uid);
-
   const likeNumber = useSelector((state) => state.like);
   // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [edit, setEdit] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
   const [name, setName] = useState("");
   const [isLike, setIsLike] = useState(false);
   const [contents, setContents] = useState("");
 
   const { id } = useParams();
   const todo = todos.find((todo) => todo.id === id);
-
-  console.log(todo);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -38,7 +34,7 @@ function Detail() {
     async function fetchLikeAsync() {
       const fetchedlike = await fetchLikeDB(id);
       dispatch(fetchLike(fetchedlike.likeNumber));
-      setIsLike(didIPressed(fetchedlike.likePeople, user.uid));
+      setIsLike(didIPressed(fetchedlike.likePeople, user ? user.uid : null));
     }
     const fetchData = async () => {
       try {
@@ -70,7 +66,7 @@ function Detail() {
           const data = doc.data();
           return { ...data };
         });
-        console.log(comments);
+        // console.log(comments);
         dispatch(setComments(comments));
       } catch (error) {
         console.log(error);
@@ -135,6 +131,7 @@ function Detail() {
 
   const onClickLike = async (e) => {
     e.preventDefault();
+    if (!user) return;
     const userId = user.uid;
     const todoId = id;
     if (likeDB(userId, todoId)) {
@@ -144,6 +141,7 @@ function Detail() {
   };
   const onClickUnLike = async (e) => {
     e.preventDefault();
+    if (!user) return;
     const userId = user.uid;
     const todoId = id;
     if (unLikeDB(userId, todoId)) {
@@ -224,24 +222,15 @@ function Detail() {
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(todo)}</div>
-
           <div style={{ marginRight: "550px" }}>
-            {isLogin && (
-              <>
-                {edit ? (
-                  <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updateTodoHandler}>
-                    저장
-                  </button>
-                ) : (
-                  <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => setEdit(true)}>
-                    수정
-                  </button>
-                )}
-
-                <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodoHandler}>
-                  삭제
-                </button>
-              </>
+            {edit ? (
+              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updateTodoHandler}>
+                저장
+              </button>
+            ) : (
+              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => setEdit(true)}>
+                수정
+              </button>
             )}
             <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodoHandler}>
               삭제
@@ -255,11 +244,7 @@ function Detail() {
                 좋아요
               </button>
             )}
-
             <span>{likeNumber}</span>
-            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => navigate("/")}>
-              이전 화면으로
-            </button>
           </div>
         </div>
       </div>
