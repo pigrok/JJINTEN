@@ -10,7 +10,7 @@ const MyPost = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const q = query(collection(db, "todos"), where("uid", "==", params.id));
+      const q = query(collection(db, "posts"), where("uid", "==", params.id));
       const querySnapshot = await getDocs(q);
 
       const initArray = [];

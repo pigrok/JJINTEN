@@ -1,9 +1,9 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import shortid from "shortid";
-import { addTodo } from "../redux/modules/todos";
+import { addPost } from "../redux/modules/posts";
 import { styled } from "styled-components";
 
 function Form({ formModal, setFormModal }) {
@@ -34,8 +34,13 @@ function Form({ formModal, setFormModal }) {
         isModified: false,
         uid: state.uid,
       };
-      await addDoc(collection(db, "todos"), data);
-      dispatch(addTodo(data));
+      await addDoc(collection(db, "posts"), data);
+      await setDoc(doc(db, "likes", data.id), {
+        likeNumber: 0,
+        likePeople: [],
+      });
+
+      dispatch(addPost(data));
       // 입력 필드 초기화
       setCategory("");
       setTitle("");

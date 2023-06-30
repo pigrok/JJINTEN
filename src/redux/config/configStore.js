@@ -4,7 +4,7 @@ import { combineReducers } from "redux";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import authReducer from "../modules/auth";
-import todos from "../modules/todos";
+import posts from "../modules/posts";
 import comments from "../modules/comments";
 // import thunk from "redux-thunk";
 
@@ -17,7 +17,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   // 여기에 modules
   auth: authReducer,
-  todos: todos,
+  posts,
   comments,
 });
 
