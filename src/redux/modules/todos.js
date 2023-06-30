@@ -33,7 +33,6 @@ const todos = (state = initialState, action) => {
       temp.push(action.payload);
       return temp;
     }
-
     case DELETE_TODO:
       return state.filter((todo) => todo.id !== action.payload);
 

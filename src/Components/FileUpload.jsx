@@ -6,9 +6,10 @@ import { updateProfile } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfilePic } from "../redux/modules/auth";
 
-const FileUpload = () => {
+const FileUpload = ({ edit, setEdit }) => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const state = useSelector((state) => state.auth.user);
+
+  console.log(edit);
 
   const dispatch = useDispatch();
 
@@ -28,14 +29,18 @@ const FileUpload = () => {
       photoURL: downloadURL,
     });
     dispatch(updateProfilePic(downloadURL));
+    setEdit(false);
   };
 
   return (
-    <div>
-      <h2>프로필 사진 업데이트</h2>
-      <input type="file" onChange={handleFileSelect} />
-      <button onClick={handleUpload}>Upload</button>
-    </div>
+    <>
+      {edit && (
+        <div>
+          <input type="file" onChange={handleFileSelect} />
+          <button onClick={handleUpload}>저장</button>
+        </div>
+      )}
+    </>
   );
 };
 

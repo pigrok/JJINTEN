@@ -5,6 +5,7 @@ const LOGIN_FAILURE = "auth/LOGIN_FAILURE";
 const LOGOUT_SUCCESS = "auth/LOGOUT_SUCCESS";
 const UPDATE_DISPLAYNAME = "auth/UPDATE_DISPLAYNAME";
 const UPDATE_PROFILEPIC = "auth/UPDATE_PROFILEPIC";
+const UPDATE_PROFILENOTE = "auth/UPDATE_PROFILENOTE";
 
 export const signUpSuccess = (user) => {
   return {
@@ -54,6 +55,13 @@ export const updateProfilePic = (payload) => {
   };
 };
 
+export const updateProfileNote = (payload) => {
+  return {
+    type: UPDATE_PROFILENOTE,
+    payload,
+  };
+};
+
 const initialState = {
   user: null,
   error: null,
@@ -97,6 +105,13 @@ const authReducer = (state = initialState, action) => {
         user: {
           ...state.user,
           photoURL: action.payload,
+        },
+      };
+    case UPDATE_PROFILENOTE:
+      return {
+        user: {
+          ...state.user,
+          note: action.payload,
         },
       };
     default:

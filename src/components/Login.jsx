@@ -36,6 +36,8 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
+          note: null,
+          lastSignTime: user.metadata.lastSignInTime,
         })
       );
       alert("로그인 성공 ^_-");
@@ -74,6 +76,8 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
+          note: null,
+          lastSignTime: user.metadata.lastSignInTime,
         })
       );
       alert("로그인 성공 ^_-");
@@ -100,6 +104,8 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
+          note: null,
+          lastSignTime: user.metadata.lastSignInTime,
         })
       );
       alert("로그인 성공 ^_-");
@@ -157,8 +163,6 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
   );
 }
 
-export default Login;
-
 const StModalBox = styled.div`
   position: fixed;
   z-index: 1;
@@ -180,3 +184,5 @@ const StModalContent = styled.div`
   height: 50%;
   border-radius: 12px;
 `;
+
+export default Login;

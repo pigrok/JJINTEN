@@ -10,8 +10,6 @@ function Header() {
   const state = useSelector((state) => state.auth);
   const user = useSelector((state) => state.auth.user);
 
-  // console.log(user);
-
   const navigate = useNavigate();
 
   const clickToMainPage = () => {
@@ -107,8 +105,9 @@ const ProfileContainer = styled.div`
 `;
 const ProfileImg = styled.img`
   margin: 5px;
-  width: 40px;
-  height: auto;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
   border-radius: 50% 50%;
 `;
 const LogoSpan = styled.span`
