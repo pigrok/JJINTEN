@@ -20,6 +20,8 @@ function Header() {
   // 로고 애니메이션
   const [displayLogo, setDisplayLogo] = useState(false);
 
+  const [showButtons, setShowButtons] = useState(false);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -56,42 +58,43 @@ function Header() {
   }, []);
 
   return (
-    <HeaderWrapper>
-      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <HeaderContainer>
-        <LeftSection>
-          {displayLogo ? (
-            <ImgBox onClick={() => window.location.replace("/")}>
-              <LogoImg src={logoPic} />
-            </ImgBox>
-          ) : (
-            <p onClick={() => window.location.replace("/")}>찐텐으로 즐겨라</p>
-          )}
-        </LeftSection>
-        <RightSection>
-          {state.user ? (
-            <ProfileContainer onClick={() => setIsOpen((prev) => !prev)}>
-              <span>{user.displayName}님</span>
-              <ProfileImg src={user.photoURL} alt="Uploaded" />
-              <span style={{ fontSize: "20px" }}>▾</span>
-              {isOpen && (
-                <ProfileMenu>
-                  <li>
-                    <ProfileMenuBtn onClick={clickToMyPage}>마이페이지</ProfileMenuBtn>
-                  </li>
-                  <li>
-                    <ProfileMenuBtn onClick={logOut}>로그아웃</ProfileMenuBtn>
-                  </li>
-                </ProfileMenu>
-              )}
-            </ProfileContainer>
-          ) : (
-            <div onClick={openLoginModal}>로그인 해주세요</div>
-          )}
-        </RightSection>
-      </HeaderContainer>
-    </HeaderWrapper>
+    <>
+      <HeaderWrapper>
+        <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+        <HeaderContainer>
+          <LeftSection>
+            {displayLogo ? (
+              <ImgBox onClick={() => window.location.replace("/")}>
+                <LogoImg src={logoPic} />
+              </ImgBox>
+            ) : (
+              <p onClick={() => window.location.replace("/")}>찐텐으로 즐겨라</p>
+            )}
+          </LeftSection>
+          <RightSection>
+            {state.user ? (
+              <ProfileContainer onClick={() => setIsOpen((prev) => !prev)}>
+                <span>{user.displayName}님</span>
+                <ProfileImg src={user.photoURL} alt="Uploaded" />
+                <span style={{ fontSize: "20px" }}>▾</span>
+                {isOpen && (
+                  <ProfileMenu>
+                    <li>
+                      <ProfileMenuBtn onClick={clickToMyPage}>마이페이지</ProfileMenuBtn>
+                    </li>
+                    <li>
+                      <ProfileMenuBtn onClick={logOut}>로그아웃</ProfileMenuBtn>
+                    </li>
+                  </ProfileMenu>
+                )}
+              </ProfileContainer>
+            ) : (
+              <div onClick={openLoginModal}>로그인 해주세요</div>
+            )}
+          </RightSection>
+        </HeaderContainer>
+      </HeaderWrapper>
+    </>
   );
 }
 

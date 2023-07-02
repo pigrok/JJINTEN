@@ -11,7 +11,7 @@ const MyPost = () => {
   const params = useParams();
   const navigate = useNavigate();
 
-  console.log(posts);
+  // console.log(posts);
 
   useEffect(() => {
     const fetchData = async () => {
