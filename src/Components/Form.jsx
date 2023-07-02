@@ -86,8 +86,8 @@ function Form({ formModal, setFormModal }) {
             <form onSubmit={handleSubmit}>
               <div>
                 <StSelectBox value={category} onChange={(e) => setCategory(e.target.value)}>
-                  <option value="">카테고리</option>
-                  <option value="문화">문화</option>
+                  <option value="">select category</option>
+                  <option value="콘서트">콘서트</option>
                   <option value="전시">전시</option>
                   <option value="공연">공연</option>
                   <option value="연극">연극</option>
@@ -107,7 +107,7 @@ function Form({ formModal, setFormModal }) {
                 />
               </div>
               <div>
-                <EditorComponent></EditorComponent>
+                <EditorComponent />
                 <StBodyInput
                   type="text"
                   name="body"

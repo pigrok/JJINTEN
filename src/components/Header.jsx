@@ -5,15 +5,16 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Login from "./Login";
 import SignUp from "./SignUp";
-import { logOutSuccess } from "../redux/modules/auth";
-import { auth } from "../firebase";
-import { signOut } from "firebase/auth";
 
 function Header() {
   const state = useSelector((state) => state.auth);
   const user = useSelector((state) => state.auth.user);
 
+  const [showButtons, setShowButtons] = useState(false);
+
   const navigate = useNavigate();
+
+  const dispatch = useDispatch("");
 
   const clickToMainPage = () => {
     navigate(`/`);
