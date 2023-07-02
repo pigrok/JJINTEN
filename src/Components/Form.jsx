@@ -79,7 +79,7 @@ function Form({ formModal, setFormModal }) {
                   <option value="">select category</option>
                   <option value="콘서트">콘서트</option>
                   <option value="전시">전시</option>
-                  <option value="공연">공연</option>
+                  <option value="클래식">클래식</option>
                   <option value="연극">연극</option>
                   <option value="뮤지컬">뮤지컬</option>
                   <option value="페스티벌">페스티벌</option>
