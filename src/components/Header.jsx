@@ -50,17 +50,14 @@ function Header() {
   useEffect(() => {
     const timer = setInterval(() => {
       setDisplayLogo((prev) => !prev);
-
-      // return () => {
-      //   clearInterval(timer);
-      // };
-    }, 3000);
+    }, 8000);
   }, []);
 
   return (
     <>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <HeaderWrapper>
-        <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
         <HeaderContainer>
           <LeftSection>
             {displayLogo ? (
@@ -68,7 +65,9 @@ function Header() {
                 <LogoImg src={logoPic} />
               </ImgBox>
             ) : (
-              <p onClick={() => window.location.replace("/")}>찐텐으로 즐겨라</p>
+              <LogoPhrase onClick={() => window.location.replace("/")}>
+                "<span style={{ color: "#bd0965" }}>찐텐</span>으로 즐기자!"
+              </LogoPhrase>
             )}
           </LeftSection>
           <RightSection>
@@ -101,8 +100,7 @@ function Header() {
 export default Header;
 
 const HeaderWrapper = styled.div`
-  margin-top: 40px;
-  margin-bottom: 40px;
+  margin: 20px;
   width: 100%;
   text-align: -webkit-center;
 `;
@@ -129,13 +127,23 @@ const RightSection = styled.div`
   position: relative;
 `;
 const ImgBox = styled.div`
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto;
 `;
 const LogoImg = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 105%;
+  height: 105%;
+`;
+const LogoPhrase = styled.p`
+  @font-face {
+    font-family: "GongGothicMedium";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicMedium.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+  }
+  font-family: "GongGothicMedium";
+  font-size: 24px;
 `;
 const ProfileContainer = styled.div`
   display: flex;

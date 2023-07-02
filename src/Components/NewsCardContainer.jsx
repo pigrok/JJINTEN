@@ -12,6 +12,8 @@ function NewsCardContainer({ sortBy, searchText, category }) {
   const [dataLength, setDataLength] = useState(0);
   const isInitialRender = useRef(true);
 
+  console.log(category);
+
   const increasePage = useCallback(() => {
     setPage((prev) => prev + 1);
   });
