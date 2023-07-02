@@ -1,13 +1,7 @@
 import React from "react";
 import { styled } from "styled-components";
 import logoPic from "../assets/logo.png";
-import { useSelector } from "react-redux";
-
-function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isModified, updatedAt, fileURL }) {
-  const user = useSelector((state) => state.auth.user);
-
-  console.log(writer);
-
+function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isModified, updatedAt, fileURL, like, views, commentNumber }) {
   const cardOnClick = () => {
     onClickFunc();
   };
@@ -17,7 +11,6 @@ function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isMod
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
     const formattedDate = `${year}년${month}월${day}일`;
-
     return formattedDate;
   };
 
@@ -44,9 +37,12 @@ function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isMod
           <NewsEmojiInfos style={{ gridColumn: "4/7", gridRow: "1" }}>{processCreatedAt(modifiedDate())}</NewsEmojiInfos>
           <NewsTitle style={{ gridColumn: "1/7", gridRow: "2" }}>{title}</NewsTitle>
           <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
-          <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:93201</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>32432개의 댓글</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>♥:</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:{views}</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>{commentNumber}개의 댓글</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>
+            ♥:
+            {like}
+          </NewsEmojiInfos>
         </NewCardInfoSection>
       </SNewsCard>
     </>
@@ -65,9 +61,18 @@ const SNewsCard = styled.div`
   height: 300px;
   box-shadow: rgba(0, 0, 0, 0.04) 0px 5px 17px 0px;
   transition: transform 0.25s ease-in 0s, box-shadow 0.25s ease-in 0s;
+  animation: entrance 0.2s;
   &:hover {
     box-shadow: 0px 0px 10px #ccc;
     transform: translateY(-5px);
+  }
+  @keyframes entrance {
+    from {
+      transform: scale(0.01);
+    }
+    to {
+      transform: scale(1);
+    }
   }
 `;
 const ImgBox = styled.div`
