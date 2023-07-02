@@ -1,6 +1,7 @@
 import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, getDoc, limit, orderBy, startAfter, startAt, endAt } from "firebase/firestore";
 import { db } from "../firebase";
-export const fetchPostData = async (sortBy = "createdAt", realPage = 1) => {
+export const fetchPostData = async (sortBy = "createdAt", realPage = 1, category = "전체") => {
+  const categoryStr = category === "전체" ? "" : category;
   const page = realPage - 1;
   try {
     if (page === 0) {
@@ -28,6 +29,7 @@ export const fetchPostData = async (sortBy = "createdAt", realPage = 1) => {
     console.log(error);
   }
 };
+
 export const increaseViewDB = async (todoId) => {
   try {
     const docRef = query(collection(db, "posts"), where("id", "==", todoId));

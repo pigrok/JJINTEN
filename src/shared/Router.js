@@ -8,7 +8,7 @@ const Router = () => {
   return (
     <div
       style={{
-        maxWidth: "1400px",
+        maxWidth: "100%",
         margin: "0 auto",
       }}
     >

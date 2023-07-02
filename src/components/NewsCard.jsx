@@ -1,7 +1,7 @@
 import React from "react";
 import { styled } from "styled-components";
-import testImage1 from "../assets/random1000/test (1).png";
-function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModified, updatedAt, like, commentsNumber, views }) {
+import logoPic from "../assets/logo.png";
+function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isModified, updatedAt, fileURL, like, views, commentNumber }) {
   const cardOnClick = () => {
     onClickFunc();
   };
@@ -13,6 +13,7 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModifi
     const formattedDate = `${year}년${month}월${day}일`;
     return formattedDate;
   };
+
   const modifiedDate = () => {
     if (isModified) {
       return updatedAt;
@@ -29,15 +30,15 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModifi
             <Category>{category}</Category>
             {isModified ? <Modified>(수정됨)</Modified> : <></>}
           </div>
-          <NewsCardImage src={testImage1}></NewsCardImage>
+          <NewsCardImage src={fileURL ? fileURL : logoPic}></NewsCardImage>
         </ImgBox>
         <NewCardInfoSection>
-          <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by:무함마드알콰리즈미</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by: {writer}</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "4/7", gridRow: "1" }}>{processCreatedAt(modifiedDate())}</NewsEmojiInfos>
           <NewsTitle style={{ gridColumn: "1/7", gridRow: "2" }}>{title}</NewsTitle>
           <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
           <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:{views}</NewsEmojiInfos>
-          <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>{commentsNumber}개의 댓글</NewsEmojiInfos>
+          <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>{commentNumber}개의 댓글</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>
             ♥:
             {like}
@@ -47,6 +48,7 @@ function NewsCard({ key, createdAt, category, title, body, onClickFunc, isModifi
     </>
   );
 }
+
 const SNewsCard = styled.div`
   margin: 0;
   background-color: rgba(255, 255, 255, 0);

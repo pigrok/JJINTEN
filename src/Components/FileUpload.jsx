@@ -5,10 +5,10 @@ import { getDownloadURL } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { updateProfilePic } from "../redux/modules/auth";
+import { styled } from "styled-components";
 
-const FileUpload = () => {
+const FileUpload = ({ edit, setEdit }) => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const state = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
 
@@ -21,22 +21,49 @@ const FileUpload = () => {
     await uploadBytes(imageRef, selectedFile);
 
     const downloadURL = await getDownloadURL(imageRef);
-    console.log("downloadURL", downloadURL);
-
     // 프로필 사진 업데이트
     await updateProfile(auth.currentUser, {
       photoURL: downloadURL,
     });
     dispatch(updateProfilePic(downloadURL));
+    setEdit(false);
   };
 
   return (
-    <div>
-      <h2>프로필 사진 업데이트</h2>
-      <input type="file" onChange={handleFileSelect} />
-      <button onClick={handleUpload}>Upload</button>
-    </div>
+    <>
+      {edit && (
+        <div>
+          <FileUploadInput type="file" onChange={handleFileSelect} />
+          <FileUploadBtn onClick={handleUpload}>이미지 업로드</FileUploadBtn>
+        </div>
+      )}
+    </>
   );
 };
 
 export default FileUpload;
+
+const FileUploadInput = styled.input`
+  position: absolute;
+  bottom: 7%;
+  width: 170px;
+`;
+
+const FileUploadBtn = styled.button`
+  position: absolute;
+  bottom: 7%;
+  left: 33%;
+  width: 80px;
+  height: 25px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #747474;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #3b3b3b;
+  }
+`;

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import NewsCardContainer from "../components/NewCardContainer";
+import NewsCardContainer from "../components/NewsCardContainer";
 import { useSelector } from "react-redux";
 import Login from "../components/Login";
-import Signup from "../components/Signup";
+import SignUp from "../components/SignUp";
 import Form from "../components/Form";
 import Button from "../components/Button";
 
@@ -12,10 +12,11 @@ function MainPage() {
   const [loginModal, setLoginModal] = useState(false);
   const [signUpModal, setSignUpModal] = useState(false);
   const [formModal, setFormModal] = useState(false);
-  const [sortBy, setSortBy] = useState("title");
+  const [sortBy, setSortBy] = useState("createdAt");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchText, setSearchText] = useState("");
-  const category = ["문화", "전시", "공연", "연극", "뮤지컬", "페스티벌"];
+  const [category, setCategory] = useState("전체");
+  const categories = ["전체", "페스티벌", "연극", "뮤지컬", "전시", "공연", "콘서트"];
 
   // 글쓰기 모달 열기
   const openFormModal = () => {
@@ -39,16 +40,21 @@ function MainPage() {
   };
   return (
     <MainPageWrapper>
-      <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <LeftContainer>
-        <MenuBar>
-          {category.map((item) => {
-            return <p>{item}</p>;
+        <CategoryMenuBar>
+          {categories.map((category) => {
+            return (
+              <p key={category} onClick={() => setCategory(category)}>
+                {category}
+              </p>
+            );
           })}
-        </MenuBar>
+        </CategoryMenuBar>
       </LeftContainer>
       <RightContainer>
+        <LinkBanner></LinkBanner>
         <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
         <Form formModal={formModal} setFormModal={setFormModal} />
         <input onChange={onChangeSearch} value={searchInputValue} />
@@ -65,7 +71,7 @@ function MainPage() {
           <SortButton onClick={sortByComment}>댓글순</SortButton>
         </SortSection>
         <CardSection>
-          <NewsCardContainer sortBy={sortBy} searchText={searchText} />
+          <NewsCardContainer category={category} sortBy={sortBy} searchText={searchText} />
         </CardSection>
       </RightContainer>
     </MainPageWrapper>
@@ -81,19 +87,27 @@ const LeftContainer = styled.div`
   align-items: center;
   text-align: center;
 `;
-const MenuBar = styled.div`
-  width: 100px;
+const CategoryMenuBar = styled.div`
+  width: 80px;
   height: 500px;
   top: 200px;
   border: 1px solid black;
   position: fixed;
+  /* margin: 20px; */
 `;
 const RightContainer = styled.div`
-  display: grid;
+  /* display: inline; */
   width: 100%;
-  grid-row-gap: 10px;
-  grid-template-rows: 30px 30px auto;
+  /* grid-row-gap: 10px;
+  grid-template-rows: 30px 30px auto; */
 `;
+
+const LinkBanner = styled.div`
+  width: 100%;
+  height: 350px;
+  /* border: 1px solid black; */
+`;
+
 const WriteSection = styled(Button)`
   width: 100%;
 `;

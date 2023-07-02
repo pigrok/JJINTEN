@@ -1,20 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, getDoc, addDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, addDoc } from "firebase/firestore";
 import shortid from "shortid";
 import { likeDB, unLikeDB, fetchLikeDB, didIPressed } from "../util/like";
 import { like, unlike, fetchLike } from "../redux/modules/like";
 import { db } from "../firebase";
-import { deleteTodo, setTodos, updateTodo } from "../redux/modules/todos";
+import { deletePost, setPosts, updatePost } from "../redux/modules/posts";
 import { addComment } from "../util/comment";
-import { addComments, setComments } from "../redux/modules/comments";
 import { increaseViewDB } from "../util/post";
+import { addComments, setComments } from "../redux/modules/comments";
+import Login from "../components/Login";
+import SignUp from "../components/SignUp";
+import { auth, storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import Comment from "../components/Comment";
+import { styled } from "styled-components";
+
 function Detail() {
-  const todos = useSelector((state) => state.todos);
+  // 로그인 및 회원가입 모달 띄우기
+  const [loginModal, setLoginModal] = useState(false);
+  const [signUpModal, setSignUpModal] = useState(false);
+
+  const posts = useSelector((state) => state.posts);
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
+
   const likeNumber = useSelector((state) => state.like);
+
   // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -22,9 +35,10 @@ function Detail() {
   const [name, setName] = useState("");
   const [isLike, setIsLike] = useState(false);
   const [contents, setContents] = useState("");
+  const [category, setCategory] = useState("");
 
   const { id } = useParams();
-  const todo = todos.find((todo) => todo.id === id);
+  const post = posts.find((post) => post.id === id);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -36,12 +50,12 @@ function Detail() {
   async function fetchData() {
     try {
       const querySnapshot = await getDocs(collection(db, "posts"));
-      const todos = querySnapshot.docs.map((doc) => {
+      const posts = querySnapshot.docs.map((doc) => {
         const data = doc.data();
         const createdAt = data.createdAt;
         return { id: doc.id, ...data, createdAt };
       });
-      dispatch(setTodos(todos));
+      dispatch(setPosts(posts));
     } catch (error) {
       console.log(error);
     }
@@ -64,7 +78,6 @@ function Detail() {
           const data = doc.data();
           return { ...data };
         });
-        console.log(comments);
         dispatch(setComments(comments));
       } catch (error) {
         console.log(error);
@@ -74,15 +87,15 @@ function Detail() {
     fetchComments();
   }, [dispatch]);
 
-  const deleteTodoHandler = async () => {
+  const deletePostHandler = async () => {
     try {
-      const q = query(collection(db, "todos"), where("id", "==", id));
+      const q = query(collection(db, "posts"), where("id", "==", id));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
         const docRef = querySnapshot.docs[0].ref;
         await deleteDoc(docRef);
-        dispatch(deleteTodo(id));
+        dispatch(deletePost(id));
 
         navigate("/");
       } else {
@@ -93,27 +106,42 @@ function Detail() {
     }
   };
 
-  const updateTodoHandler = async () => {
+  const updatePostHandler = async () => {
     try {
       if (!title || !body) {
         alert("제목과 내용을 입력해주세요.");
         return;
       }
 
-      const q = query(collection(db, "todos"), where("id", "==", todo.id));
+      const q = query(collection(db, "posts"), where("id", "==", post.id));
       const querySnapshot = await getDocs(q);
 
       if (!querySnapshot.empty) {
         const docRef = querySnapshot.docs[0].ref;
         const updatedData = {
+          category:
+            category === "콘서트"
+              ? "콘서트"
+              : category === "전시"
+              ? "전시"
+              : category === "공연"
+              ? "공연"
+              : category === "연극"
+              ? "연극"
+              : category === "뮤지컬"
+              ? "뮤지컬"
+              : category === "페스티벌"
+              ? "페스티벌"
+              : "",
           title: title,
           body: body,
           updatedAt: new Date().toString(),
           isModified: true,
+          fileURL: post.fileURL,
         };
         await updateDoc(docRef, updatedData);
-        const updatedTodo = { ...todo, ...updatedData };
-        dispatch(updateTodo(updatedTodo));
+        const updatedPost = { ...post, ...updatedData };
+        dispatch(updatePost(updatedPost));
         setEdit(false);
       } else {
         console.log("해당 id를 가진 문서를 찾을 수 없습니다.");
@@ -126,9 +154,10 @@ function Detail() {
   const onClickLike = async (e) => {
     if (!user) return;
     e.preventDefault();
+    if (!user) return;
     const userId = user.uid;
-    const todoId = id;
-    if (likeDB(userId, todoId)) {
+    const postId = id;
+    if (likeDB(userId, postId)) {
       dispatch(like());
       setIsLike(!isLike);
     }
@@ -136,9 +165,10 @@ function Detail() {
   const onClickUnLike = async (e) => {
     if (!user) return;
     e.preventDefault();
+    if (!user) return;
     const userId = user.uid;
-    const todoId = id;
-    if (unLikeDB(userId, todoId)) {
+    const postId = id;
+    if (unLikeDB(userId, postId)) {
       dispatch(unlike());
       setIsLike(!isLike);
     }
@@ -154,7 +184,7 @@ function Detail() {
       contents: contents,
       updatedAt: new Date().toString(),
       isModified: true,
-      postId: todo.id,
+      postId: post.id,
       uid: user.uid,
       writer: user.displayName,
       profile: user.photoURL,
@@ -165,11 +195,11 @@ function Detail() {
     dispatch(addComments(data));
   };
 
-  const modifiedDateCard = (todo) => {
-    if (todo && todo.isModified) {
-      return todo.updatedAt;
-    } else if (todo && !todo.isModified) {
-      return todo.createdAt;
+  const modifiedDateCard = (post) => {
+    if (post && post.isModified) {
+      return post.updatedAt;
+    } else if (post && !post.isModified) {
+      return post.createdAt;
     } else {
       return "";
     }
@@ -191,50 +221,134 @@ function Detail() {
     }
   };
 
+  // 사진 업로드
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // 사진 수정
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("파일을 선택해주세요.");
+      return;
+    }
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile.name}`);
+    await uploadBytes(imageRef, selectedFile);
+
+    const downloadURL = await getDownloadURL(imageRef);
+
+    const updatedPost = { ...post, fileURL: downloadURL };
+    dispatch(updatePost(updatedPost));
+
+    // 기존 코드 유지
+    setSelectedFile(null);
+    setFileURL(null);
+  };
+
+  const isPostCreatedByCurrentUser = user && post && user.uid === post.uid;
+
+  const processCreatedAt = (dateString) => {
+    const date = new Date(Date.parse(dateString));
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hour = date.getHours().toString();
+    const minute = date.getMinutes().toString();
+    const formattedDate = `${year}.${month}.${day}.${hour}.${minute}`;
+
+    return formattedDate;
+  };
+
   return (
     <div>
-      <div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(todo)}</div>
-
-          <div style={{ marginRight: "550px" }}>
-            {edit ? (
-              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updateTodoHandler}>
-                저장
-              </button>
-            ) : (
-              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => setEdit(true)}>
-                수정
-              </button>
-            )}
-            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deleteTodoHandler}>
-              삭제
-            </button>
-            {isLike ? (
-              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={onClickUnLike}>
-                ㄴㄴㄴ
-              </button>
-            ) : (
-              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={onClickLike}>
-                좋아요
-              </button>
-            )}
-
-            <span>{likeNumber}</span>
-            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => navigate("/")}>
-              이전 화면으로
-            </button>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <TitleBarContainer>
+        <TitleBar>
+          <div style={{ marginLeft: "200px", color: "#fdfdef" }}>
+            <div>
+              {edit ? (
+                <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                  <option value="콘서트">콘서트 </option>
+                  <option value="전시">전시</option>
+                  <option value="공연">공연</option>
+                  <option value="연극">연극</option>
+                  <option value="뮤지컬">뮤지컬</option>
+                  <option value="페스티벌">페스티벌</option>
+                </select>
+              ) : (
+                <p>{post?.category}</p>
+              )}
+            </div>
+            <div>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", fontSize: "30px" }}>
+                  {edit && <input style={{ width: "50%", height: "50px" }} value={title} onChange={(e) => setTitle(e.target.value)} />}
+                  {!edit && post?.title}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", margin: "5px 0 30px 5px" }}>
+                  <div style={{ marginRight: "10px" }}> by.{post?.writer}.</div>
+                  <div style={{ marginRight: "10px" }}>{processCreatedAt(modifiedDateCard(post))}</div>
+                  <div>
+                    {!isLike ? (
+                      <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickLike}>
+                        좋아요
+                      </button>
+                    ) : (
+                      <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickUnLike}>
+                        좋아요취소
+                      </button>
+                    )}
+                    {isPostCreatedByCurrentUser ? (
+                      <>
+                        {edit ? (
+                          <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={updatePostHandler}>
+                            저장
+                          </button>
+                        ) : (
+                          <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={() => setEdit(true)}>
+                            수정
+                          </button>
+                        )}
+                        <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={deletePostHandler}>
+                          삭제
+                        </button>
+                      </>
+                    ) : (
+                      <></>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        </TitleBar>
+      </TitleBarContainer>
+      <div>
+        <div>
+          {post && (
+            <div style={{ border: "1px solid black", marginTop: "70px", width: "100%", height: "500px", whiteSpace: "pre-line" }}>
+              {edit && <textarea style={{ width: "100%", height: "600px" }} value={body} onChange={(e) => setBody(e.target.value)} />}
+              {!edit && (
+                <>
+                  {post.fileURL && <img style={{ width: "300px", height: "300px" }} src={post.fileURL} />}
+                  <br />
+                  {post?.body}
+                </>
+              )}
+            </div>
+          )}
         </div>
-      </div>
-      <div style={{ padding: "10px", margin: "10px", width: "1000px", height: "500px" }}>
-        <div style={{ border: "1px solid black", textAlign: "center" }}>
-          <p>title: {todo?.title}</p>
-          {edit && <input value={title} onChange={(e) => setTitle(e.target.value)} />}
-        </div>
-        <div style={{ border: "1px solid black", marginTop: "20px", height: "400px" }}>
-          <p>body: {todo?.body}</p>
-          {edit && <textarea value={body} onChange={(e) => setBody(e.target.value)} />}
+        <div>
+          {edit && (
+            <div>
+              <input type="file" onChange={handleFileSelect} />
+              <button onClick={handleUpload}>Upload</button>
+            </div>
+          )}
         </div>
       </div>
       <div>
@@ -252,20 +366,39 @@ function Detail() {
             <button type="submit">작성</button>
           </form>
         </div>
-        <div>
-          {comments.sort(compareDateComment).map((comment) => (
-            <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }} key={comment?.id}>
-              <img style={{ height: "50px", width: "50px" }} src={comment.profile}></img>
-              <p>{comment.writer}</p>
-              <p>content: {comment.contents}</p>
-              <p>작성일자: {modifiedDateComment(comment)}</p>
-              {/* <button onClick={() => handleCommentDelete(comment.id)}>삭제</button> */}
-            </div>
-          ))}
-        </div>
+        {comments.sort(compareDateComment).map((comment) => {
+          return (
+            <Comment
+              key={comment.id}
+              user={user}
+              id={comment.id}
+              uid={comment.uid}
+              postId={comment.postId}
+              commentId={comment.commentId}
+              writer={comment.writer}
+              profile={comment.profile}
+              post={post}
+              comment={comment}
+              updatedAt={comment.updatedAt}
+              isModified={comment.isModified}
+              commentContents={comment.contents}
+            />
+          );
+        })}
       </div>
     </div>
   );
 }
+const TitleBarContainer = styled.div`
+  width: 100%;
+`;
+
+const TitleBar = styled.div`
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  background-color: #cccccc;
+`;
 
 export default Detail;
