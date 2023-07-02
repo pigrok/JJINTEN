@@ -16,7 +16,9 @@ import { auth, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Comment from "../components/Comment";
 import { styled } from "styled-components";
-
+import { BsHeartFill } from "react-icons/bs";
+import { BsHeart } from "react-icons/bs";
+import EditorComponent from "../components/EditorComponent";
 function Detail() {
   // 로그인 및 회원가입 모달 띄우기
   const [loginModal, setLoginModal] = useState(false);
@@ -36,6 +38,7 @@ function Detail() {
   const [isLike, setIsLike] = useState(false);
   const [contents, setContents] = useState("");
   const [category, setCategory] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const { id } = useParams();
   const post = posts.find((post) => post.id === id);
@@ -137,7 +140,7 @@ function Detail() {
           body: body,
           updatedAt: new Date().toString(),
           isModified: true,
-          fileURL: post.fileURL,
+          fileURL: selectedFile ? selectedFile : post.fileURL,
         };
         await updateDoc(docRef, updatedData);
         const updatedPost = { ...post, ...updatedData };
@@ -221,33 +224,6 @@ function Detail() {
     }
   };
 
-  // 사진 업로드
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileURL, setFileURL] = useState(null);
-
-  const handleFileSelect = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
-
-  // 사진 수정
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert("파일을 선택해주세요.");
-      return;
-    }
-    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile.name}`);
-    await uploadBytes(imageRef, selectedFile);
-
-    const downloadURL = await getDownloadURL(imageRef);
-
-    const updatedPost = { ...post, fileURL: downloadURL };
-    dispatch(updatePost(updatedPost));
-
-    // 기존 코드 유지
-    setSelectedFile(null);
-    setFileURL(null);
-  };
-
   const isPostCreatedByCurrentUser = user && post && user.uid === post.uid;
 
   const processCreatedAt = (dateString) => {
@@ -295,11 +271,13 @@ function Detail() {
                   <div>
                     {!isLike ? (
                       <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickLike}>
-                        좋아요
+                        <BsHeart />
+                        {likeNumber}
                       </button>
                     ) : (
                       <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickUnLike}>
-                        좋아요취소
+                        <BsHeartFill color="red" />
+                        {likeNumber}
                       </button>
                     )}
                     {isPostCreatedByCurrentUser ? (
@@ -330,23 +308,12 @@ function Detail() {
       <div>
         <div>
           {post && (
-            <div style={{ border: "1px solid black", marginTop: "70px", width: "100%", height: "500px", whiteSpace: "pre-line" }}>
-              {edit && <textarea style={{ width: "100%", height: "600px" }} value={body} onChange={(e) => setBody(e.target.value)} />}
-              {!edit && (
-                <>
-                  {post.fileURL && <img style={{ width: "300px", height: "300px" }} src={post.fileURL} />}
-                  <br />
-                  {post?.body}
-                </>
+            <div style={{ border: "1px solid black", marginTop: "70px", width: "100%", whiteSpace: "pre-line" }}>
+              {!edit ? (
+                <div className="Description" dangerouslySetInnerHTML={{ __html: post.body }}></div>
+              ) : (
+                <EditorComponent setBody={setBody} setSelectedFile={setSelectedFile} initData={post.body} />
               )}
-            </div>
-          )}
-        </div>
-        <div>
-          {edit && (
-            <div>
-              <input type="file" onChange={handleFileSelect} />
-              <button onClick={handleUpload}>Upload</button>
             </div>
           )}
         </div>

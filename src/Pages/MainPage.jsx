@@ -46,7 +46,14 @@ function MainPage() {
         <CategoryMenuBar>
           {categories.map((category) => {
             return (
-              <p key={category} onClick={() => setCategory(category)}>
+              <p
+                style={{ cursor: "pointer" }}
+                key={category}
+                onClick={() => {
+                  console.log(category);
+                  setCategory(category);
+                }}
+              >
                 {category}
               </p>
             );
