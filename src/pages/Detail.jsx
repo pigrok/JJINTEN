@@ -21,8 +21,7 @@ import { BsHeartFill } from "react-icons/bs";
 import { BsHeart } from "react-icons/bs";
 import { BiEditAlt } from "react-icons/bi";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { LuSave } from "react-icons/lu";
-import { LuShare2, LuSiren } from "react-icons/lu";
+import { LuSave, LuShare2, LuSiren } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import EditorComponent from "../components/EditorComponent";
 
@@ -420,7 +419,7 @@ function Detail() {
                     updatedAt={comment.updatedAt}
                     isModified={comment.isModified}
                     commentContents={comment.contents}
-                    commentNumber={post.commentNumber}
+                    commentNumber={comment.commentNumber}
                   />
                   <Line2 />
                 </div>
