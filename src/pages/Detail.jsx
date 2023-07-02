@@ -7,6 +7,8 @@ import { likeDB, unLikeDB, fetchLikeDB, didIPressed } from "../util/like";
 import { like, unlike, fetchLike } from "../redux/modules/like";
 import { db } from "../firebase";
 import { deletePost, setPosts, updatePost } from "../redux/modules/posts";
+import { addComment } from "../util/comment";
+import { increaseViewDB } from "../util/post";
 import { addComments, setComments } from "../redux/modules/comments";
 import Login from "../components/Login";
 import SignUp from "../components/SignUp";
@@ -14,18 +16,6 @@ import { auth, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Comment from "../components/Comment";
 import { styled } from "styled-components";
-
-const TitleBarContainer = styled.div`
-  width: 100%;
-`;
-
-const TitleBar = styled.div`
-  width: 100%;
-  height: 200px;
-  display: flex;
-  align-items: center;
-  background-color: #cccccc;
-`;
 
 function Detail() {
   // 로그인 및 회원가입 모달 띄우기
@@ -52,33 +42,32 @@ function Detail() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    async function fetchLikeAsync() {
-      const fetchedlike = await fetchLikeDB(id);
-      dispatch(fetchLike(fetchedlike.likeNumber));
-      setIsLike(didIPressed(fetchedlike.likePeople, user ? user.uid : null));
+  async function fetchLikeAsync() {
+    const fetchedlike = await fetchLikeDB(id);
+    dispatch(fetchLike(fetchedlike.likeNumber));
+    setIsLike(didIPressed(fetchedlike.likePeople, user ? user.uid : null));
+  }
+  async function fetchData() {
+    try {
+      const querySnapshot = await getDocs(collection(db, "posts"));
+      const posts = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        const createdAt = data.createdAt;
+        return { id: doc.id, ...data, createdAt };
+      });
+      dispatch(setPosts(posts));
+    } catch (error) {
+      console.log(error);
     }
-    const fetchData = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "posts"));
-        const posts = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const createdAt = data.createdAt;
-          return { id: doc.id, ...data, createdAt };
-        });
-        dispatch(setPosts(posts));
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  }
+  async function increaseView() {
+    await increaseViewDB(id);
+  }
+  useEffect(() => {
     fetchLikeAsync();
     fetchData();
+    increaseView();
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(setPosts(posts));
-  }, [dispatch, posts]);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -89,7 +78,6 @@ function Detail() {
           const data = doc.data();
           return { ...data };
         });
-        // console.log(comments);
         dispatch(setComments(comments));
       } catch (error) {
         console.log(error);
@@ -97,11 +85,7 @@ function Detail() {
     };
 
     fetchComments();
-  }, [dispatch, id]);
-
-  useEffect(() => {
-    dispatch(setComments(comments));
-  }, [dispatch, comments]);
+  }, [dispatch]);
 
   const deletePostHandler = async () => {
     try {
@@ -168,6 +152,7 @@ function Detail() {
   };
 
   const onClickLike = async (e) => {
+    if (!user) return;
     e.preventDefault();
     if (!user) return;
     const userId = user.uid;
@@ -178,6 +163,7 @@ function Detail() {
     }
   };
   const onClickUnLike = async (e) => {
+    if (!user) return;
     e.preventDefault();
     if (!user) return;
     const userId = user.uid;
@@ -189,35 +175,24 @@ function Detail() {
   };
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
-
-    if (!user) {
-      setLoginModal(true);
-    } else if (!contents) {
+    if (!contents) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
     }
-
-    try {
-      const data = {
-        id: shortid.generate(),
-        contents: contents,
-        updatedAt: new Date().toString(),
-        isModified: true,
-        postId: post.id,
-        uid: user.uid,
-        writer: user.displayName,
-        profile: user.photoURL,
-      };
-
-      await addDoc(collection(db, "comments"), data);
-
-      dispatch(addComments(data));
-
-      setName("");
-      setContents("");
-    } catch (error) {
-      console.error("데이터 추가 에러:", error);
-    }
+    const data = {
+      id: shortid.generate(),
+      contents: contents,
+      updatedAt: new Date().toString(),
+      isModified: true,
+      postId: post.id,
+      uid: user.uid,
+      writer: user.displayName,
+      profile: user.photoURL,
+    };
+    await addComment(id, data);
+    setName("");
+    setContents("");
+    dispatch(addComments(data));
   };
 
   const modifiedDateCard = (post) => {
@@ -318,7 +293,15 @@ function Detail() {
                   <div style={{ marginRight: "10px" }}> by.{post?.writer}.</div>
                   <div style={{ marginRight: "10px" }}>{processCreatedAt(modifiedDateCard(post))}</div>
                   <div>
-                    {" "}
+                    {!isLike ? (
+                      <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickLike}>
+                        좋아요
+                      </button>
+                    ) : (
+                      <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickUnLike}>
+                        좋아요취소
+                      </button>
+                    )}
                     {isPostCreatedByCurrentUser ? (
                       <>
                         {edit ? (
@@ -406,5 +389,16 @@ function Detail() {
     </div>
   );
 }
+const TitleBarContainer = styled.div`
+  width: 100%;
+`;
+
+const TitleBar = styled.div`
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  background-color: #cccccc;
+`;
 
 export default Detail;

@@ -25,7 +25,6 @@ export const storage = getStorage(app);
 //social Logins
 export const signInWithGoogle = () => {
   const googleProvider = new GoogleAuthProvider();
-
   return signInWithPopup(auth, googleProvider);
 };
 export const signInWithGithub = () => {
