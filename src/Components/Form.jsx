@@ -79,7 +79,7 @@ function Form({ formModal, setFormModal }) {
                   <option value="">select category</option>
                   <option value="콘서트">콘서트</option>
                   <option value="전시">전시</option>
-                  <option value="공연">공연</option>
+                  <option value="클래식">클래식</option>
                   <option value="연극">연극</option>
                   <option value="뮤지컬">뮤지컬</option>
                   <option value="페스티벌">페스티벌</option>
@@ -98,14 +98,6 @@ function Form({ formModal, setFormModal }) {
               </div>
               <div>
                 <EditorComponent setBody={setBody} setSelectedFile={setSelectedFile} />
-                {/* <StBodyInput
-                  type="text"
-                  name="body"
-                  value={body}
-                  onChange={(e) => {
-                    setBody(e.target.value);
-                  }}
-                /> */}
               </div>
               <ButtonContainer>
                 <Stbutton marginRight="0px" onClick={cancelButtonHandler}>
@@ -143,7 +135,7 @@ const StModalContent = styled.div`
   background-color: #fff;
   padding: 20px;
   width: 700px;
-  height: 620px;
+  height: 600px;
   border-radius: 10px;
 `;
 
