@@ -56,6 +56,8 @@ function NewsCardContainer({ category }) {
     }
   };
 
+  console.log(posts);
+
   return (
     <NewsCardContinerWrapper>
       {posts.sort(compareDateCard).map((post) => {

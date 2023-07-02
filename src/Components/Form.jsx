@@ -6,6 +6,7 @@ import shortid from "shortid";
 import { addPost } from "../redux/modules/posts";
 import { styled } from "styled-components";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import EditorComponent from "./EditorComponent";
 
 function Form({ formModal, setFormModal }) {
   const [category, setCategory] = useState("");
@@ -28,9 +29,7 @@ function Form({ formModal, setFormModal }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile}`);
-    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${shortid.generate()}_${selectedFile.name}`);
-
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${shortid.generate()}_${selectedFile}`);
     await uploadBytes(imageRef, selectedFile);
 
     const fileURL = await getDownloadURL(imageRef);
@@ -53,6 +52,7 @@ function Form({ formModal, setFormModal }) {
         uid: state.uid,
         likeNumber: 0,
         likePeople: [],
+        views: 0,
         writer: user.displayName,
       };
       await addDoc(collection(db, "posts"), data);
@@ -83,9 +83,10 @@ function Form({ formModal, setFormModal }) {
       {formModal ? (
         <StModalBox>
           <StModalContent>
+            {/* <h2 style={{ margin: "10px" }}>게시글 작성</h2> */}
             <form onSubmit={handleSubmit}>
               <div>
-                <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                <StSelectBox value={category} onChange={(e) => setCategory(e.target.value)}>
                   <option value="">select category</option>
                   <option value="콘서트">콘서트</option>
                   <option value="전시">전시</option>
@@ -93,36 +94,40 @@ function Form({ formModal, setFormModal }) {
                   <option value="연극">연극</option>
                   <option value="뮤지컬">뮤지컬</option>
                   <option value="페스티벌">페스티벌</option>
-                </select>
+                </StSelectBox>
               </div>
               <div>
-                <label>제목</label>
-                <input
+                <StTitleInput
                   type="text"
                   name="title"
+                  placeholder="제목을 입력하세요"
                   value={title}
                   onChange={(e) => {
                     setTitle(e.target.value);
                   }}
-                ></input>
+                />
               </div>
               <div>
-                <label>내용</label>
-                <input
+                <EditorComponent />
+                <StBodyInput
                   type="text"
                   name="body"
                   value={body}
                   onChange={(e) => {
                     setBody(e.target.value);
                   }}
-                ></input>
+                />
               </div>
               <div>
-                <input type="file" onChange={handleFileSelect} />
+                <input type="file" onChange={handleFileSelect} style={{ marginLeft: "10px" }} />
               </div>
-              <button type="submit">작성</button>
+              <ButtonContainer>
+                <Stbutton marginRight="0px" onClick={cancelButtonHandler}>
+                  취소
+                </Stbutton>
+                <Stbutton type="submit">작성</Stbutton>
+              </ButtonContainer>
             </form>
-            <button onClick={cancelButtonHandler}>취소</button>
           </StModalContent>
         </StModalBox>
       ) : (
@@ -136,6 +141,7 @@ export default Form;
 
 const StModalBox = styled.div`
   position: fixed;
+  z-index: 1;
   top: 0;
   left: 0;
   width: 100%;
@@ -144,13 +150,60 @@ const StModalBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px); /* 배경에 blur 효과 적용 */
+  backdrop-filter: blur(8px);
 `;
 
 const StModalContent = styled.div`
   background-color: #fff;
   padding: 20px;
-  width: 30%;
-  height: 50%;
-  border-radius: 12px;
+  width: 700px;
+  height: 600px;
+  border-radius: 10px;
+`;
+
+const StSelectBox = styled.select`
+  width: 150px;
+  height: 30px;
+  margin-left: 10px;
+  margin-top: 20px;
+  padding: 5px;
+  font-size: 15px;
+`;
+
+const StTitleInput = styled.input`
+  width: 250px;
+  height: 35px;
+  margin: 10px;
+  font-size: 25px;
+  font-weight: bold;
+  padding: 5px;
+  border: none;
+  outline: none;
+`;
+
+const StBodyInput = styled.textarea`
+  width: 660px;
+  height: 280px;
+  margin-left: 10px;
+  font-size: 15px;
+  padding: 10px;
+  outline: none;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  float: right;
+`;
+
+const Stbutton = styled.button`
+  width: 100px;
+  height: 35px;
+  color: #fff;
+  background-color: #bd0965;
+  font-size: 15px;
+  border: none;
+  border-radius: 5px;
+  margin: 10px;
+  margin-right: ${({ marginRight }) => marginRight};
+  padding: 5px;
 `;

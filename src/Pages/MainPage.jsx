@@ -40,7 +40,7 @@ function MainPage() {
       <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <LeftContainer>
-        <MenuBar>
+        <CategoryMenuBar>
           {categories.map((category) => {
             return (
               <p key={category} onClick={() => setCategory(category)}>
@@ -48,9 +48,10 @@ function MainPage() {
               </p>
             );
           })}
-        </MenuBar>
+        </CategoryMenuBar>
       </LeftContainer>
       <RightContainer>
+        <LinkBanner></LinkBanner>
         <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
         <Form formModal={formModal} setFormModal={setFormModal} />
         <SortSection>
@@ -75,7 +76,7 @@ const LeftContainer = styled.div`
   align-items: center;
   text-align: center;
 `;
-const MenuBar = styled.div`
+const CategoryMenuBar = styled.div`
   width: 80px;
   height: 500px;
   top: 200px;
@@ -84,11 +85,18 @@ const MenuBar = styled.div`
   /* margin: 20px; */
 `;
 const RightContainer = styled.div`
-  display: grid;
+  /* display: inline; */
   width: 100%;
-  grid-row-gap: 10px;
-  grid-template-rows: 30px 30px auto;
+  /* grid-row-gap: 10px;
+  grid-template-rows: 30px 30px auto; */
 `;
+
+const LinkBanner = styled.div`
+  width: 100%;
+  height: 350px;
+  /* border: 1px solid black; */
+`;
+
 const WriteSection = styled(Button)`
   width: 100%;
 `;
