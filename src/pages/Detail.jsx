@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, addDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, addDoc, getDoc } from "firebase/firestore";
 import shortid from "shortid";
 import { likeDB, unLikeDB, fetchLikeDB, didIPressed } from "../util/like";
 import { like, unlike, fetchLike } from "../redux/modules/like";
@@ -16,20 +16,20 @@ import { auth, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Comment from "../components/Comment";
 import { styled } from "styled-components";
+import { BsHeartFill } from "react-icons/bs";
+import { BsHeart } from "react-icons/bs";
 
 function Detail() {
   // 로그인 및 회원가입 모달 띄우기
   const [loginModal, setLoginModal] = useState(false);
   const [signUpModal, setSignUpModal] = useState(false);
+  const [post, setPost] = useState({});
 
-  const posts = useSelector((state) => state.posts);
+  //const posts = useSelector((state) => state.posts);
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
-
-  console.log(posts);
-
   const likeNumber = useSelector((state) => state.like);
-
+  const { id } = useParams();
   // useState를 사용하여 로컬 상태 변수를 정의
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -39,8 +39,7 @@ function Detail() {
   const [contents, setContents] = useState("");
   const [category, setCategory] = useState("");
 
-  const { id } = useParams();
-  const post = posts.find((post) => post.id === id);
+  //const post = posts.find((post) => post.id === id);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -51,22 +50,27 @@ function Detail() {
   }
   async function fetchData() {
     try {
-      const querySnapshot = await getDocs(collection(db, "posts"));
-      const posts = querySnapshot.docs.map((doc) => {
-        const data = doc.data();
-        const createdAt = data.createdAt;
-        return { id: doc.id, ...data, createdAt };
-      });
-      dispatch(setPosts(posts));
-    } catch (error) {
-      console.log(error);
+      const docRef = query(collection(db, "posts"), where("id", "==", id));
+      const querySnapshot = await getDocs(docRef);
+      if (!querySnapshot.empty) {
+        const docRef = querySnapshot.docs[0].ref;
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setPost(data);
+        } else {
+          console.log("No such document!");
+          return null;
+        }
+      }
+    } catch (e) {
+      console.log(e);
     }
   }
   async function increaseView() {
     await increaseViewDB(id);
   }
   useEffect(() => {
-    fetchLikeAsync();
     fetchData();
     increaseView();
   }, [dispatch]);
@@ -297,11 +301,13 @@ function Detail() {
                   <div>
                     {!isLike ? (
                       <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickLike}>
-                        좋아요
+                        <BsHeart />
+                        {likeNumber}
                       </button>
                     ) : (
                       <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickUnLike}>
-                        좋아요취소
+                        <BsHeartFill color="red" />
+                        {likeNumber}
                       </button>
                     )}
                     {isPostCreatedByCurrentUser ? (

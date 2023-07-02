@@ -6,26 +6,19 @@ import Login from "../components/Login";
 import SignUp from "../components/SignUp";
 import Form from "../components/Form";
 import Button from "../components/Button";
+import Footer from "../components/Footer";
+import { FiSearch } from "react-icons/fi";
 
 function MainPage() {
   const state = useSelector((state) => state.auth);
   const [loginModal, setLoginModal] = useState(false);
   const [signUpModal, setSignUpModal] = useState(false);
-  const [formModal, setFormModal] = useState(false);
   const [sortBy, setSortBy] = useState("createdAt");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchText, setSearchText] = useState("");
   const [category, setCategory] = useState("전체");
   const categories = ["전체", "페스티벌", "연극", "뮤지컬", "전시", "공연", "콘서트"];
 
-  // 글쓰기 모달 열기
-  const openFormModal = () => {
-    if (!state.user) {
-      setLoginModal(true);
-    } else {
-      setFormModal(true);
-    }
-  };
   const onChangeSearch = (e) => {
     setSearchInputValue(e.target.value);
   };
@@ -39,42 +32,45 @@ function MainPage() {
     setSortBy("commentNumber");
   };
   return (
-    <MainPageWrapper>
-      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <LeftContainer>
-        <CategoryMenuBar>
-          {categories.map((category) => {
-            return (
-              <p key={category} onClick={() => setCategory(category)}>
-                {category}
-              </p>
-            );
-          })}
-        </CategoryMenuBar>
-      </LeftContainer>
-      <RightContainer>
-        <LinkBanner></LinkBanner>
-        <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
-        <Form formModal={formModal} setFormModal={setFormModal} />
-        <input onChange={onChangeSearch} value={searchInputValue} />
-        <button
-          onClick={() => {
-            setSearchText(searchInputValue);
-          }}
-        >
-          검색
-        </button>
-        <SortSection>
-          <SortButton onClick={sortByView}>조회수순</SortButton>
-          <SortButton onClick={sortByLike}>좋아요순</SortButton>
-          <SortButton onClick={sortByComment}>댓글순</SortButton>
-        </SortSection>
-        <CardSection>
-          <NewsCardContainer category={category} sortBy={sortBy} searchText={searchText} />
-        </CardSection>
-      </RightContainer>
-    </MainPageWrapper>
+    <>
+      <MainPageWrapper>
+        <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+        <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+        <LeftContainer>
+          <CategoryMenuBar>
+            {categories.map((category) => {
+              return (
+                <p key={category} onClick={() => setCategory(category)}>
+                  {category}
+                </p>
+              );
+            })}
+          </CategoryMenuBar>
+        </LeftContainer>
+        <RightContainer>
+          <SearchSection>
+            <InputBox onChange={onChangeSearch} value={searchInputValue} placeholder="검색어를 입력해주세요" />
+            <Stbutton
+              onClick={() => {
+                setSearchText(searchInputValue);
+              }}
+            >
+              <FiSearch />
+            </Stbutton>
+          </SearchSection>
+          <LinkBanner></LinkBanner>
+          <SortSection>
+            <SortButton onClick={sortByView}>조회수순</SortButton>
+            <SortButton onClick={sortByLike}>좋아요순</SortButton>
+            <SortButton onClick={sortByComment}>댓글순</SortButton>
+          </SortSection>
+          <CardSection>
+            <NewsCardContainer category={category} sortBy={sortBy} searchText={searchText} />
+          </CardSection>
+        </RightContainer>
+      </MainPageWrapper>
+      <Footer />
+    </>
   );
 }
 
@@ -108,20 +104,64 @@ const LinkBanner = styled.div`
   /* border: 1px solid black; */
 `;
 
-const WriteSection = styled(Button)`
-  width: 100%;
-`;
 const SortSection = styled.div`
-  height: 30px;
+  height: 45px;
   text-align: right;
+  margin-right: 5px;
 `;
+const SearchSection = styled.div`
+  height: 45px;
+  text-align: right;
+  /* margin-right: 170px; */
+  margin-top: 10px;
+`;
+
 const CardSection = styled.div`
   height: auto;
   width: 100%;
 `;
-const SortButton = styled(Button)`
-  margin-right: 5px;
+
+const InputBox = styled.input`
+  width: 130px;
+  height: 28px;
+  padding-left: 10px;
+  font-size: 14px;
+  display: inline-block;
+  border: none;
+  border-radius: 25px;
+  outline: none;
+
+  /* &:focus {
+    border: 1px solid #bd0965;
+    border-radius: 25px;
+    outline: none;
+  } */
 `;
+
+const Stbutton = styled.button`
+  background-color: #fff;
+  border: none;
+  font-size: 20px;
+  margin-top: 5px;
+`;
+
+const SortButton = styled.button`
+  width: 70px;
+  height: 30px;
+  margin-right: 10px;
+  cursor: pointer;
+  color: gray;
+  font-size: 14px;
+  border-radius: 25px;
+  background-color: #fff;
+  border: 1px solid gray;
+
+  &:hover {
+    background-color: gray;
+    color: #fff;
+  }
+`;
+
 const GoUpButton = styled.button`
   width: 45px;
   height: 45px;
