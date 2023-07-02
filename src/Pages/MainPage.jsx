@@ -3,7 +3,7 @@ import styled from "styled-components";
 import NewsCardContainer from "../components/NewsCardContainer";
 import { useSelector } from "react-redux";
 import Login from "../components/Login";
-import SignUp from "../components/SignUp";
+import Signup from "../components/Signup";
 import Form from "../components/Form";
 import Button from "../components/Button";
 import LinkBanner from "../components/LinkBanner";

@@ -4,7 +4,7 @@ import logoPic from "../assets/logo_nuki.png";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Login from "./Login";
-import SignUp from "./SignUp";
+import Singup from "./Signup";
 import { signOut } from "firebase/auth";
 import { logOutSuccess } from "../redux/modules/auth";
 import { auth } from "../firebase";

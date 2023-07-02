@@ -11,7 +11,7 @@ import { addComment } from "../util/comment";
 import { increaseViewDB } from "../util/post";
 import { addComments, setComments } from "../redux/modules/comments";
 import Login from "../components/Login";
-import SignUp from "../components/SignUp";
+import Signup from "../components/Signup";
 import { auth, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Comment from "../components/Comment";
