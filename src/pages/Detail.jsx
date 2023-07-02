@@ -16,9 +16,16 @@ import { auth, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Comment from "../components/Comment";
 import { styled } from "styled-components";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 import { BsHeartFill } from "react-icons/bs";
 import { BsHeart } from "react-icons/bs";
+import { BiEditAlt } from "react-icons/bi";
+import { RiDeleteBin5Line } from "react-icons/ri";
+import { LuSave } from "react-icons/lu";
+import { LuShare2, LuSiren } from "react-icons/lu";
+import { Link } from "react-router-dom";
 import EditorComponent from "../components/EditorComponent";
+
 function Detail() {
   // 로그인 및 회원가입 모달 띄우기
   const [loginModal, setLoginModal] = useState(false);
@@ -38,7 +45,6 @@ function Detail() {
   const [isLike, setIsLike] = useState(false);
   const [contents, setContents] = useState("");
   const [category, setCategory] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const { id } = useParams();
   const post = posts.find((post) => post.id === id);
@@ -47,6 +53,9 @@ function Detail() {
   const dispatch = useDispatch();
   async function fetchLikeAsync() {
     const fetchedlike = await fetchLikeDB(id);
+    console.log(fetchedlike);
+    console.log(user);
+    console.log(likeNumber);
     dispatch(fetchLike(fetchedlike.likeNumber));
     setIsLike(didIPressed(fetchedlike.likePeople, user ? user.uid : null));
   }
@@ -101,6 +110,7 @@ function Detail() {
         dispatch(deletePost(id));
 
         navigate("/");
+        alert("삭제되었습니다!");
       } else {
         console.log("해당 id를 가진 문서를 찾을 수 없습니다.");
       }
@@ -140,12 +150,13 @@ function Detail() {
           body: body,
           updatedAt: new Date().toString(),
           isModified: true,
-          fileURL: selectedFile ? selectedFile : post.fileURL,
+          fileURL: post.fileURL,
         };
         await updateDoc(docRef, updatedData);
         const updatedPost = { ...post, ...updatedData };
         dispatch(updatePost(updatedPost));
         setEdit(false);
+        alert("저장되었습니다!");
       } else {
         console.log("해당 id를 가진 문서를 찾을 수 없습니다.");
       }
@@ -193,6 +204,7 @@ function Detail() {
       profile: user.photoURL,
     };
     await addComment(id, data);
+    window.location.reload();
     setName("");
     setContents("");
     dispatch(addComments(data));
@@ -224,6 +236,33 @@ function Detail() {
     }
   };
 
+  // 사진 업로드
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileURL, setFileURL] = useState(null);
+
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  // 사진 수정
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("파일을 선택해주세요.");
+      return;
+    }
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile.name}`);
+    await uploadBytes(imageRef, selectedFile);
+
+    const downloadURL = await getDownloadURL(imageRef);
+
+    const updatedPost = { ...post, fileURL: downloadURL };
+    dispatch(updatePost(updatedPost));
+
+    // 기존 코드 유지
+    setSelectedFile(null);
+    setFileURL(null);
+  };
+
   const isPostCreatedByCurrentUser = user && post && user.uid === post.uid;
 
   const processCreatedAt = (dateString) => {
@@ -238,13 +277,20 @@ function Detail() {
     return formattedDate;
   };
 
+  const filteredPosts = posts.filter((p) => {
+    if (p?.category === post?.category && p.id !== post.id) {
+      return true;
+    }
+    return false;
+  });
+
   return (
     <div>
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <TitleBarContainer>
         <TitleBar>
-          <div style={{ marginLeft: "200px", color: "#fdfdef" }}>
+          <TitleBox>
             <div>
               {edit ? (
                 <select value={category} onChange={(e) => setCategory(e.target.value)}>
@@ -261,98 +307,146 @@ function Detail() {
             </div>
             <div>
               <div>
-                <div style={{ display: "flex", alignItems: "center", fontSize: "30px" }}>
+                <EditTitle>
                   {edit && <input style={{ width: "50%", height: "50px" }} value={title} onChange={(e) => setTitle(e.target.value)} />}
                   {!edit && post?.title}
-                </div>
+                </EditTitle>
                 <div style={{ display: "flex", alignItems: "center", margin: "5px 0 30px 5px" }}>
                   <div style={{ marginRight: "10px" }}> by.{post?.writer}.</div>
                   <div style={{ marginRight: "10px" }}>{processCreatedAt(modifiedDateCard(post))}</div>
-                  <div>
-                    {!isLike ? (
-                      <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickLike}>
-                        <BsHeart />
-                        {likeNumber}
-                      </button>
-                    ) : (
-                      <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={onClickUnLike}>
-                        <BsHeartFill color="red" />
-                        {likeNumber}
-                      </button>
-                    )}
-                    {isPostCreatedByCurrentUser ? (
-                      <>
-                        {edit ? (
-                          <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={updatePostHandler}>
-                            저장
-                          </button>
-                        ) : (
-                          <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={() => setEdit(true)}>
-                            수정
-                          </button>
-                        )}
-                        <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={deletePostHandler}>
-                          삭제
-                        </button>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </TitleBox>
         </TitleBar>
       </TitleBarContainer>
-      <div>
-        <div>
-          {post && (
-            <div style={{ border: "1px solid black", marginTop: "70px", width: "100%", whiteSpace: "pre-line" }}>
-              {!edit ? (
-                <div className="Description" dangerouslySetInnerHTML={{ __html: post.body }}></div>
-              ) : (
-                <EditorComponent setBody={setBody} setSelectedFile={setSelectedFile} initData={post.body} />
-              )}
-            </div>
+      <Wrapper>
+        <Body>
+          <div>
+            {post && (
+              <div style={{ border: "1px solid black", marginTop: "70px", width: "100%", whiteSpace: "pre-line" }}>
+                {!edit ? (
+                  <div className="Description" dangerouslySetInnerHTML={{ __html: post.body }}></div>
+                ) : (
+                  <EditorComponent setBody={setBody} setSelectedFile={setSelectedFile} initData={post.body} />
+                )}
+              </div>
+            )}
+          </div>
+        </Body>
+        <Feature>
+          {!isLike ? (
+            <FeatureButton onClick={onClickLike}>
+              <BsHeart size="23" />
+              {likeNumber}
+            </FeatureButton>
+          ) : (
+            <FeatureButton onClick={onClickUnLike}>
+              <BsHeartFill color="red" size="23" />
+              {likeNumber}
+            </FeatureButton>
           )}
+          {isPostCreatedByCurrentUser ? (
+            <>
+              {edit ? (
+                <FeatureButton onClick={updatePostHandler}>
+                  <LuSave size="23" />
+                </FeatureButton>
+              ) : (
+                <FeatureButton onClick={() => setEdit(true)}>
+                  <BiEditAlt size="23" />
+                </FeatureButton>
+              )}
+              <FeatureButton onClick={deletePostHandler}>
+                <RiDeleteBin5Line size="23" />
+              </FeatureButton>
+            </>
+          ) : (
+            <>
+              <CopyToClipboard text={`localhost:3000/${post?.id}/ `}>
+                <FeatureButton
+                  onClick={() => {
+                    alert("공유 주소가 복사되었습니다!");
+                  }}
+                >
+                  <LuShare2 size="23" />
+                </FeatureButton>
+              </CopyToClipboard>
+
+              <FeatureButton
+                onClick={() => {
+                  alert("신고 금지!");
+                }}
+              >
+                <LuSiren size="23" />
+              </FeatureButton>
+            </>
+          )}
+        </Feature>
+        <div>
+          <CategoryArticles>[{post?.category}] 카테고리 추천 글</CategoryArticles>
+          <Line1 />
+          <RelativeArticles>
+            {filteredPosts.slice(0, 5).map((filteredPosts) => {
+              return (
+                <Articles key={filteredPosts.id}>
+                  <Link to={`/${filteredPosts.id}`} target="_blank" rel="noopener noreferrer">
+                    <NewsCardImage src={filteredPosts.fileURL} />
+                    <div>{filteredPosts.title}</div>
+                  </Link>
+                </Articles>
+              );
+            })}
+          </RelativeArticles>
+          <CommentCount>댓글 {post?.commentNumber}</CommentCount>
         </div>
-      </div>
-      <div>
-        <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>
-          <form onSubmit={handleCommentSubmit}>
-            <h3>댓글</h3>
-            <br />
-            <input
-              name="댓글"
-              value={contents}
-              onChange={(e) => {
-                setContents(e.target.value);
-              }}
-            />
-            <button type="submit">작성</button>
-          </form>
+        <div>
+          <Line1 />
+          <CommentList>
+            {comments.sort(compareDateComment).map((comment) => {
+              return (
+                <div>
+                  <Comment
+                    key={comment.id}
+                    user={user}
+                    id={comment.id}
+                    uid={comment.uid}
+                    postId={comment.postId}
+                    commentId={comment.commentId}
+                    writer={comment.writer}
+                    profile={comment.profile}
+                    post={post}
+                    comment={comment}
+                    updatedAt={comment.updatedAt}
+                    isModified={comment.isModified}
+                    commentContents={comment.contents}
+                    commentNumber={post.commentNumber}
+                  />
+                  <Line2 />
+                </div>
+              );
+            })}
+          </CommentList>
+          <CommentForm>
+            <form onSubmit={handleCommentSubmit}>
+              <CommentProfile>
+                <ProfileImg src={user.photoURL}></ProfileImg>
+                <CommentProfileName>{user.displayName}</CommentProfileName>
+              </CommentProfile>
+              <br />
+              <CommentInput
+                name="댓글"
+                value={contents}
+                onChange={(e) => {
+                  setContents(e.target.value);
+                }}
+              />
+              <FeatureButton type="submit">작성</FeatureButton>
+            </form>
+            <Line1 />
+          </CommentForm>
         </div>
-        {comments.sort(compareDateComment).map((comment) => {
-          return (
-            <Comment
-              key={comment.id}
-              user={user}
-              id={comment.id}
-              uid={comment.uid}
-              postId={comment.postId}
-              commentId={comment.commentId}
-              writer={comment.writer}
-              profile={comment.profile}
-              post={post}
-              comment={comment}
-              updatedAt={comment.updatedAt}
-              isModified={comment.isModified}
-              commentContents={comment.contents}
-            />
-          );
-        })}
-      </div>
+      </Wrapper>
     </div>
   );
 }
@@ -368,4 +462,134 @@ const TitleBar = styled.div`
   background-color: #cccccc;
 `;
 
+const TitleBox = styled.div`
+  margin-left: 200px;
+  color: #fdfdef;
+`;
+
+const Body = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
+
+const BodyForm = styled.div`
+  width: 1240px;
+  height: 500px;
+  white-space: pre-line;
+`;
+
+const BodyTextarea = styled.textarea`
+  width: 100%;
+  height: 600px;
+`;
+
+const BodyImage = styled.img`
+  width: 300px;
+  height: 300px;
+`;
+
+const Feature = styled.div`
+  border: 1px solid #959595;
+  border-color: rgba(185, 185, 185, 0.5);
+  border-radius: 15px;
+  padding: 9px;
+  width: 150px;
+
+  margin-bottom: 50px;
+`;
+
+const FeatureButton = styled.button`
+  border: 1px solid #ffffff;
+  width: 50px;
+  height: 20px;
+  background-color: transparent;
+  font-size: 15px;
+`;
+
+const EditTitle = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 40px;
+`;
+
+const Wrapper = styled.div`
+  // position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  margin-top: 50px;
+`;
+
+const CategoryArticles = styled.div`
+  /* margin: 20px 0 15px 110px; */
+`;
+
+const RelativeArticles = styled.div`
+  display: flex;
+`;
+
+const Articles = styled.div`
+  padding: 20px;
+  text-align: center;
+`;
+
+const NewsCardImage = styled.img`
+  border-radius: 5px 5px 0 0;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+`;
+
+const CommentCount = styled.div`
+  margin-left: 5px;
+`;
+
+const Line1 = styled.hr`
+  width: 1240px;
+  margin: 15px 0 15px 0;
+`;
+
+const Line2 = styled.div`
+  border-top: 1px dashed black;
+  margin: 30px 0 30px 0;
+`;
+
+const CommentList = styled.div`
+  width: 1240px;
+  word-wrap: break-word;
+`;
+const CommentForm = styled.div`
+  margin-top: 40px 0 40px 0;
+`;
+
+const CommentProfile = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const CommentProfileName = styled.p`
+  margin: 15px;
+`;
+
+const ProfileImg = styled.img`
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50% 50%;
+  margin-left: 10px;
+`;
+
+const CommentInput = styled.input`
+  width: 100%;
+  min-height: 100px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+  font-size: 17px;
+`;
 export default Detail;
