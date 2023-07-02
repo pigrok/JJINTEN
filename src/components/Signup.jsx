@@ -5,7 +5,7 @@ import { auth } from "../firebase";
 import { signUpFailure } from "../redux/modules/auth";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
-function Signup({ signUpModal, setSignUpModal, setLoginModal }) {
+function SignUp({ signUpModal, setSignUpModal, setLoginModal }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [checkpassword, setCheckPassword] = useState("");
@@ -211,4 +211,4 @@ const StMainButton = styled.button`
   color: white;
 `;
 
-export default Signup;
+export default SignUp;
