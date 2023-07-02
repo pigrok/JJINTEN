@@ -1,11 +1,10 @@
 import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, getDoc, limit, orderBy, startAfter, startAt, endAt } from "firebase/firestore";
 import { db } from "../firebase";
 export const fetchPostData = async (sortBy = "createdAt", realPage = 1, category = "전체") => {
-  const categoryStr = category === "전체" ? "" : category;
   const page = realPage - 1;
   try {
     if (page === 0) {
-      const next = query(collection(db, "posts"), orderBy(sortBy, "desc"), limit(8));
+      const next = query(collection(db, "posts"), category === "전체" ? "" : where("category", "==", category), orderBy(sortBy, "desc"), limit(8));
       const snap = await getDocs(next);
       const posts = snap.docs.map((doc) => {
         const data = doc.data();
@@ -14,10 +13,10 @@ export const fetchPostData = async (sortBy = "createdAt", realPage = 1, category
       return posts;
     } else if (page > 0) {
       const pageView = page * 8;
-      const index = query(collection(db, "posts"), orderBy(sortBy, "desc"), limit(pageView));
+      const index = query(collection(db, "posts"), category === "전체" ? "" : where("category", "==", category), orderBy(sortBy, "desc"), limit(pageView));
       const documentSnapshots = await getDocs(index);
       const lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
-      const next = query(collection(db, "posts"), orderBy(sortBy, "desc"), startAfter(lastVisible), limit(8));
+      const next = query(collection(db, "posts"), category === "전체" ? "" : where("category", "==", category), orderBy(sortBy, "desc"), startAfter(lastVisible), limit(8));
       const snap = await getDocs(next);
       const posts = snap.docs.map((doc) => {
         const data = doc.data();
