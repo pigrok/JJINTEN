@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Login from "./Login";
 import SignUp from "./SignUp";
+import { logOutSuccess } from "../redux/modules/auth";
+import { auth } from "../firebase";
+import { signOut } from "firebase/auth";
 
 function Header() {
   const state = useSelector((state) => state.auth);
@@ -31,30 +34,33 @@ function Header() {
   };
 
   return (
-    <HeaderWrapper>
-      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+    <>
       <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <HeaderContainer>
-        <LeftSection onClick={clickToMainPage}>
-          <ImgBox>
-            <LogoImg src={logoPic} />
-          </ImgBox>
-          <LogoSpan>JJINTEN</LogoSpan>
-        </LeftSection>
-        <RightSection>
-          {state.user ? (
-            <ProfileContainer onClick={clickToMyPage}>
-              <span>{user.displayName}님</span>
-              <ProfileImg src={user.photoURL} alt="Uploaded" />
-              <span style={{ fontSize: "20px" }}>▾</span>
-            </ProfileContainer>
-          ) : (
-            <div onClick={openLoginModal}>로그인 해주세요</div>
-          )}
-          <button>로그아웃</button>
-        </RightSection>
-      </HeaderContainer>
-    </HeaderWrapper>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <HeaderWrapper>
+        <HeaderContainer>
+          <LeftSection onClick={clickToMainPage}>
+            <a href="/">
+              <ImgBox>
+                <LogoImg src={logoPic} />
+              </ImgBox>
+            </a>
+            <LogoSpan>JJINTEN</LogoSpan>
+          </LeftSection>
+          <RightSection>
+            {state.user ? (
+              <ProfileContainer onClick={clickToMyPage}>
+                <span>{user.displayName}님</span>
+                <ProfileImg src={user.photoURL} alt="Uploaded" />
+                {/* <span style={{ fontSize: "20px" }}>▾</span> */}
+              </ProfileContainer>
+            ) : (
+              <div onClick={openLoginModal}>로그인 해주세요</div>
+            )}
+          </RightSection>
+        </HeaderContainer>
+      </HeaderWrapper>
+    </>
   );
 }
 
