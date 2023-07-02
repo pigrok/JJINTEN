@@ -17,7 +17,10 @@ function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isMod
 
   const processBody = (bodyStr) => {
     let result = "";
-    result = bodyStr.replace(/\n/g, "").replace(/<[^>]*>?/g, "");
+    result = bodyStr
+      .replace(/\n/g, "")
+      .replace(/<[^>]*>?/g, "")
+      .replace(/&nbsp;/gi, "");
     return result;
   };
 

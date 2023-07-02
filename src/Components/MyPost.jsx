@@ -51,13 +51,32 @@ const MyPost = () => {
 
   const processBody = (bodyStr) => {
     let result = "";
-    result = bodyStr.replace(/\n/g, "").replace(/<[^>]*>?/g, "");
+    result = bodyStr
+      .replace(/\n/g, "")
+      .replace(/<[^>]*>?/g, "")
+      .replace(/&nbsp;/gi, "");
     return result;
+  };
+
+  const compareDateComment = (a, b) => {
+    const aDate = new Date(modifiedDateComment(a));
+    const bDate = new Date(modifiedDateComment(b));
+    return bDate - aDate;
+  };
+
+  const modifiedDateComment = (comment) => {
+    if (comment && comment.isModified) {
+      return comment.updatedAt;
+    } else if (comment && !comment.isModified) {
+      return comment.createdAt;
+    } else {
+      return "";
+    }
   };
 
   return (
     <div>
-      {posts.map((post) => {
+      {posts.sort(compareDateComment).map((post) => {
         return (
           <PostContainer key={post.id}>
             <PostBox onClick={() => clickToDetail(post.id)}>
