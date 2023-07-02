@@ -6,6 +6,13 @@ import Login from "../components/Login";
 import SignUp from "../components/SignUp";
 import Form from "../components/Form";
 import Button from "../components/Button";
+import LinkBanner from "../components/LinkBanner";
+import { PiMicrophoneStageDuotone } from "react-icons/pi";
+import { MdOutlineFestival, MdOutlineDensitySmall } from "react-icons/md";
+import { GiTheaterCurtains } from "react-icons/gi";
+import { FaTheaterMasks } from "react-icons/fa";
+import { AiOutlinePicture } from "react-icons/ai";
+import { BsMusicNoteBeamed } from "react-icons/bs";
 import Footer from "../components/Footer";
 import { FiSearch } from "react-icons/fi";
 
@@ -17,7 +24,15 @@ function MainPage() {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchText, setSearchText] = useState("");
   const [category, setCategory] = useState("전체");
-  const categories = ["전체", "페스티벌", "연극", "뮤지컬", "전시", "공연", "콘서트"];
+  const categories = [
+    { category: "전체", icon: <MdOutlineDensitySmall size="40" /> },
+    { category: "연극", icon: <GiTheaterCurtains size="40" /> },
+    { category: "페스티벌", icon: <MdOutlineFestival size="40" /> },
+    { category: "뮤지컬", icon: <FaTheaterMasks size="40" /> },
+    { category: "전시", icon: <AiOutlinePicture size="40" /> },
+    { category: "클래식", icon: <BsMusicNoteBeamed size="40" /> },
+    { category: "콘서트", icon: <PiMicrophoneStageDuotone size="40" /> },
+  ];
 
   const onChangeSearch = (e) => {
     setSearchInputValue(e.target.value);
@@ -46,28 +61,19 @@ function MainPage() {
       <MainPageWrapper>
         <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
         <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-        <LeftContainer>
+        <LeftContainer></LeftContainer>
+        <RightContainer>
+          <LinkBanner></LinkBanner>
           <CategoryMenuBar>
-            {categories.map((category) => {
+            {categories.map((c) => {
               return (
-                <p
-                  style={{ cursor: "pointer" }}
-                  key={category}
-                  onClick={() => {
-                    console.log(category);
-                    setCategory(category);
-                  }}
-                >
-                  {category}
-                </p>
+                <CategoryBox key={c.category} onClick={() => setCategory(c.category)}>
+                  <CategoryItem>{c.icon}</CategoryItem>
+                  <CategoryItem>{c.category}</CategoryItem>
+                </CategoryBox>
               );
             })}
           </CategoryMenuBar>
-        </LeftContainer>
-        <RightContainer>
-          <LinkBanner></LinkBanner>
-          {/* <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection> */}
-          {/* <Form formModal={formModal} setFormModal={setFormModal} /> */}
           <SortSection>
             <SortButton onClick={sortByView}>조회수순</SortButton>
             <SortButton onClick={sortByLike}>좋아요순</SortButton>
@@ -87,18 +93,12 @@ const MainPageWrapper = styled.div`
   grid-template-columns: 100px minmax(300px, 1250px) 50px;
 `;
 const LeftContainer = styled.div`
-  -webkit-box-align: center;
+  /* -webkit-box-align: center;
   align-items: center;
+  text-align: center; */
   text-align: center;
 `;
-const CategoryMenuBar = styled.div`
-  width: 80px;
-  height: 500px;
-  top: 200px;
-  border: 1px solid black;
-  position: fixed;
-  /* margin: 20px; */
-`;
+
 const RightContainer = styled.div`
   /* display: inline; */
   width: 100%;
@@ -106,10 +106,27 @@ const RightContainer = styled.div`
 grid-template-rows: 30px 30px auto; */
 `;
 
-const LinkBanner = styled.div`
-  width: 100%;
-  height: 350px;
-  /* border: 1px solid black; */
+const CategoryMenuBar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0px 20px 0px;
+  border-top: 1px solid #e6e6e6;
+  border-bottom: 1px solid #e6e6e6;
+`;
+
+const CategoryBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const CategoryItem = styled.span`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 50px;
+  cursor: pointer;
 `;
 
 const SortSection = styled.div`
@@ -127,6 +144,7 @@ const SearchSection = styled.div`
 const CardSection = styled.div`
   height: auto;
   width: 100%;
+  margin-top: 50px;
 `;
 
 const InputBox = styled.input`
@@ -150,13 +168,14 @@ const Stbutton = styled.button`
 const SortButton = styled.button`
   width: 70px;
   height: 30px;
-  margin-right: 10px;
+  /* margin-right: 10px; */
   cursor: pointer;
   color: gray;
   font-size: 14px;
   border-radius: 25px;
   background-color: #fff;
   border: 1px solid gray;
+  margin: 40px 5px;
 
   &:hover {
     background-color: gray;

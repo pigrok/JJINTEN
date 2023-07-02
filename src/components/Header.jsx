@@ -54,11 +54,7 @@ function Header() {
   useEffect(() => {
     const timer = setInterval(() => {
       setDisplayLogo((prev) => !prev);
-
-      // return () => {
-      //   clearInterval(timer);
-      // };
-    }, 3000);
+    }, 8000);
   }, []);
 
   // 글쓰기 모달 열기
@@ -83,7 +79,9 @@ function Header() {
                 <LogoImg src={logoPic} />
               </ImgBox>
             ) : (
-              <p onClick={() => window.location.replace("/")}>찐텐으로 즐겨라</p>
+              <LogoPhrase onClick={() => window.location.replace("/")}>
+                "<span style={{ color: "#bd0965" }}>찐텐</span>으로 즐기자!"
+              </LogoPhrase>
             )}
           </LeftSection>
           <RightSection>
@@ -153,8 +151,18 @@ const ImgBox = styled.div`
   margin: 0 auto;
 `;
 const LogoImg = styled.img`
-  width: 100%;
-  height: 100%;
+  width: 105%;
+  height: 105%;
+`;
+const LogoPhrase = styled.p`
+  @font-face {
+    font-family: "GongGothicMedium";
+    src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10@1.0/GongGothicMedium.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+  }
+  font-family: "GongGothicMedium";
+  font-size: 24px;
 `;
 const ProfileContainer = styled.div`
   display: flex;

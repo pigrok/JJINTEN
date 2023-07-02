@@ -46,14 +46,15 @@ export default FileUpload;
 const FileUploadInput = styled.input`
   position: absolute;
   bottom: 7%;
+  left: 8%;
   width: 170px;
 `;
 
 const FileUploadBtn = styled.button`
   position: absolute;
   bottom: 7%;
-  left: 33%;
-  width: 80px;
+  left: 32%;
+  width: 86px;
   height: 25px;
   color: #ffffff;
   font-size: 12px;
