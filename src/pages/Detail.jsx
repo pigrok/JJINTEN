@@ -26,6 +26,8 @@ function Detail() {
   const comments = useSelector((state) => state.comments);
   const user = useSelector((state) => state.auth.user);
 
+  console.log(posts);
+
   const likeNumber = useSelector((state) => state.like);
 
   // useState를 사용하여 로컬 상태 변수를 정의
