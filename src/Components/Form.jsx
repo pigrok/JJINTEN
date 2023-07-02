@@ -107,9 +107,6 @@ function Form({ formModal, setFormModal }) {
                   }}
                 /> */}
               </div>
-              <div>
-                <input type="file" onChange={handleFileSelect} style={{ marginLeft: "10px" }} />
-              </div>
               <ButtonContainer>
                 <Stbutton marginRight="0px" onClick={cancelButtonHandler}>
                   취소

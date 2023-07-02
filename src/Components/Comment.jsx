@@ -4,6 +4,7 @@ import { collection, deleteDoc, getDocs, query, updateDoc, where } from "firebas
 import { db } from "../firebase";
 import { deleteComment, updateComment } from "../redux/modules/comments";
 import { styled } from "styled-components";
+import { commentDeleteHandlerDB } from "../util/comment";
 
 function Comment({ post, user, comment, comments, commentContents, commentNumber, id, commentId, updatedAt, isModified, postId, uid, writer, profile }) {
   const [name, setName] = useState("");
@@ -13,21 +14,8 @@ function Comment({ post, user, comment, comments, commentContents, commentNumber
   const dispatch = useDispatch();
 
   const commentDeleteHandler = async (commentId) => {
-    try {
-      const q = query(collection(db, "comments"), where("id", "==", commentId));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const docRef = querySnapshot.docs[0].ref;
-        await deleteDoc(docRef);
-        dispatch(deleteComment(commentId));
-        alert("댓글이 삭제되었습니다.");
-      } else {
-        console.log("해당 id를 가진 문서를 찾을 수 없습니다.");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    await commentDeleteHandlerDB(commentId, postId);
+    dispatch(deleteComment(commentId));
   };
 
   const updateCommentHandler = async (commentId) => {

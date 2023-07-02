@@ -24,6 +24,7 @@ import { RiDeleteBin5Line } from "react-icons/ri";
 import { LuSave } from "react-icons/lu";
 import { LuShare2, LuSiren } from "react-icons/lu";
 import { Link } from "react-router-dom";
+import EditorComponent from "../components/EditorComponent";
 
 function Detail() {
   // 로그인 및 회원가입 모달 띄우기
@@ -203,6 +204,7 @@ function Detail() {
       profile: user.photoURL,
     };
     await addComment(id, data);
+    window.location.reload();
     setName("");
     setContents("");
     dispatch(addComments(data));
@@ -322,26 +324,15 @@ function Detail() {
         <Body>
           <div>
             {post && (
-              <BodyForm>
-                {edit && <BodyTextarea value={body} onChange={(e) => setBody(e.target.value)} />}
-                {!edit && (
-                  <>
-                    {post.fileURL && <BodyImage src={post.fileURL} />}
-                    <br />
-                    {post?.body}
-                  </>
+              <div style={{ border: "1px solid black", marginTop: "70px", width: "100%", whiteSpace: "pre-line" }}>
+                {!edit ? (
+                  <div className="Description" dangerouslySetInnerHTML={{ __html: post.body }}></div>
+                ) : (
+                  <EditorComponent setBody={setBody} setSelectedFile={setSelectedFile} initData={post.body} />
                 )}
-              </BodyForm>
-            )}
-          </div>
-          <div>
-            {edit && (
-              <div>
-                <input type="file" onChange={handleFileSelect} />
-                <button onClick={handleUpload}>Upload</button>
               </div>
             )}
-          </div>{" "}
+          </div>
         </Body>
         <Feature>
           {!isLike ? (
