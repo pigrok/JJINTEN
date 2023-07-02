@@ -19,7 +19,6 @@ function NewsCardContainer({ sortBy, searchText, category }) {
   });
   const [observe, unobserve] = useIntersectionObserver(increasePage);
   const navigate = useNavigate();
-
   async function fetchDatas(sortBy, page, category) {
     console.log(page + "페이지 불러옴");
     const posts = await fetchPostData(sortBy, page, category);
@@ -88,11 +87,9 @@ function NewsCardContainer({ sortBy, searchText, category }) {
       observe(ref.current);
     }
   }, [dataLength]);
-
   const navigateClick = (postId) => {
     navigate(`/${postId}`);
   };
-
   return (
     <NewsCardContinerWrapper>
       {posts.map((post) => {
