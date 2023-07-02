@@ -32,49 +32,54 @@ function MainPage() {
     setSortBy("commentNumber");
   };
   return (
-    <MainPageWrapper>
-      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <LeftContainer>
-        <CategoryMenuBar>
-          {categories.map((category) => {
-            return (
-              <p
-                style={{ cursor: "pointer" }}
-                key={category}
-                onClick={() => {
-                  console.log(category);
-                  setCategory(category);
-                }}
-              >
-                {category}
-              </p>
-            );
-          })}
-        </CategoryMenuBar>
-      </LeftContainer>
-      <RightContainer>
-        <LinkBanner></LinkBanner>
-        <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
-        <Form formModal={formModal} setFormModal={setFormModal} />
-        <input onChange={onChangeSearch} value={searchInputValue} />
-        <button
+    <>
+      <SearchSection>
+        <InputBox placeholder="검색어를 입력해주세요" onChange={onChangeSearch} value={searchInputValue} />
+        <Stbutton
           onClick={() => {
             setSearchText(searchInputValue);
           }}
         >
-          검색
-        </button>
-        <SortSection>
-          <SortButton onClick={sortByView}>조회수순</SortButton>
-          <SortButton onClick={sortByLike}>좋아요순</SortButton>
-          <SortButton onClick={sortByComment}>댓글순</SortButton>
-        </SortSection>
-        <CardSection>
-          <NewsCardContainer category={category} sortBy={sortBy} searchText={searchText} />
-        </CardSection>
-      </RightContainer>
-    </MainPageWrapper>
+          <FiSearch />
+        </Stbutton>
+      </SearchSection>
+      <MainPageWrapper>
+        <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+        <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+        <LeftContainer>
+          <CategoryMenuBar>
+            {categories.map((category) => {
+              return (
+                <p
+                  style={{ cursor: "pointer" }}
+                  key={category}
+                  onClick={() => {
+                    console.log(category);
+                    setCategory(category);
+                  }}
+                >
+                  {category}
+                </p>
+              );
+            })}
+          </CategoryMenuBar>
+        </LeftContainer>
+        <RightContainer>
+          <LinkBanner></LinkBanner>
+          {/* <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection> */}
+          {/* <Form formModal={formModal} setFormModal={setFormModal} /> */}
+          <SortSection>
+            <SortButton onClick={sortByView}>조회수순</SortButton>
+            <SortButton onClick={sortByLike}>좋아요순</SortButton>
+            <SortButton onClick={sortByComment}>댓글순</SortButton>
+          </SortSection>
+          <CardSection>
+            <NewsCardContainer category={category} sortBy={sortBy} searchText={searchText} />
+          </CardSection>
+        </RightContainer>
+      </MainPageWrapper>
+      <Footer />
+    </>
   );
 }
 
@@ -116,7 +121,7 @@ const SortSection = styled.div`
 const SearchSection = styled.div`
   height: 45px;
   text-align: right;
-  /* margin-right: 170px; */
+  margin-right: 170px;
   margin-top: 10px;
 `;
 
@@ -134,12 +139,6 @@ const InputBox = styled.input`
   border: none;
   border-radius: 25px;
   outline: none;
-
-  /* &:focus {
-    border: 1px solid #bd0965;
-    border-radius: 25px;
-    outline: none;
-  } */
 `;
 
 const Stbutton = styled.button`

@@ -67,10 +67,3 @@ function EditorComponent({ setBody, setSelectedFile, initData = "<p>This is some
 }
 
 export default EditorComponent;
-
-// 스타일 영역
-const EditorWrapper = styled.div`
-  .ck-editor__editable {
-    height: 300px;
-  }
-`;
