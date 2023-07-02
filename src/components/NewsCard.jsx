@@ -13,7 +13,11 @@ function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isMod
     const formattedDate = `${year}년${month}월${day}일`;
     return formattedDate;
   };
-
+  const processBody = (bodyStr) => {
+    let result = "";
+    result = bodyStr.replace(/\n/g, "").replace(/<[^>]*>?/g, "");
+    return result;
+  };
   const modifiedDate = () => {
     if (isModified) {
       return updatedAt;
@@ -36,7 +40,7 @@ function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isMod
           <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "1" }}>by: {writer}</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "4/7", gridRow: "1" }}>{processCreatedAt(modifiedDate())}</NewsEmojiInfos>
           <NewsTitle style={{ gridColumn: "1/7", gridRow: "2" }}>{title}</NewsTitle>
-          <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{body}</NewsDesc>
+          <NewsDesc style={{ gridColumn: "1/7", gridRow: "3/5" }}>{processBody(body)}</NewsDesc>
           <NewsEmojiInfos style={{ gridColumn: "1/3", gridRow: "6" }}>조회수:{views}</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "3/5", gridRow: "6" }}>{commentNumber}개의 댓글</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "5/7", gridRow: "6" }}>
