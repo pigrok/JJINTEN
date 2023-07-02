@@ -2,20 +2,23 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import { signOut, updateProfile } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 import FileUpload from "../components/FileUpload";
 import MyPost from "../components/MyPost";
-import { logOutSuccess, updateDisplayName, updateProfileNote } from "../redux/modules/auth";
+import MyLikePost from "../components/MyLikePost";
+import { updateDisplayName, updateProfileComment } from "../redux/modules/auth";
 import { styled } from "styled-components";
 
 const MyPage = () => {
   const user = useSelector((state) => state.auth.user);
   const [edit, setEdit] = useState(false); // 수정 토글
+  const [filter, setFilter] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState("");
-  const [note, SetNote] = useState("");
+  const [comment, SetComment] = useState("");
+
+  console.log(filter);
 
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const onChangeHandler = (event) => {
     const {
@@ -24,8 +27,8 @@ const MyPage = () => {
     if (name === "newDisplayName") {
       setNewDisplayName(value);
     }
-    if (name === "note") {
-      SetNote(value);
+    if (name === "comment") {
+      SetComment(value);
     }
   };
 
@@ -37,8 +40,8 @@ const MyPage = () => {
   // 프로필 수정 핸들러
   const profileEditHandler = (event) => {
     event.preventDefault();
-    if (newDisplayName && note) {
-      dispatch(updateProfileNote(note));
+    if (newDisplayName && comment) {
+      dispatch(updateProfileComment(comment));
 
       // 기존 닉네임과 변경할 닉네임이 다를 때만 실행
       if (user.displayName !== newDisplayName) {
@@ -61,6 +64,14 @@ const MyPage = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const clickViewMyPost = () => {
+    setFilter(false);
+  };
+
+  const clickViewMyLikePost = () => {
+    setFilter(true);
   };
 
   // 시간 변형
@@ -103,13 +114,13 @@ const MyPage = () => {
             {edit ? (
               <p>
                 <form>
-                  Comment : <ProfileInfoInput value={note} onChange={onChangeHandler} name="note" type="text" autoComplete="off" />
+                  Comment : <ProfileInfoInput value={comment} onChange={onChangeHandler} name="comment" type="text" autoComplete="off" />
                   {edit && <InfoUploadBtn onClick={profileEditHandler}>내용 저장</InfoUploadBtn>}
                 </form>
               </p>
             ) : (
               <p>
-                Comment : <ProfileInfoValue>{user.note}</ProfileInfoValue>
+                Comment : <ProfileInfoValue>{user.comment}</ProfileInfoValue>
               </p>
             )}
             <p>Last Login Time : {processCreatedAt(user.lastSignTime)}</p>
@@ -118,10 +129,14 @@ const MyPage = () => {
       </ProfileContainer>
       <MyPostContainer>
         <div>
-          <MyPostBtn>작성글</MyPostBtn>
-          <MyPostBtn>좋아요한 글</MyPostBtn>
+          <MyPostBtn variant={!filter} onClick={clickViewMyPost}>
+            작성글
+          </MyPostBtn>
+          <MyPostBtn variant={filter} onClick={clickViewMyLikePost}>
+            좋아요한 글
+          </MyPostBtn>
         </div>
-        <MyPost />
+        {!filter ? <MyPost /> : <MyLikePost />}
       </MyPostContainer>
     </ProfileWrapper>
   );
@@ -209,7 +224,7 @@ const InfoUploadBtn = styled.button`
   position: absolute;
   right: 3%;
   bottom: 7%;
-  width: 62px;
+  width: 68px;
   height: 28px;
   color: #ffffff;
   font-size: 12px;
@@ -229,26 +244,33 @@ const MyPostContainer = styled.div`
 `;
 
 const MyPostBtn = styled.button`
-  width: 120px;
-  height: 33px;
-  color: #bd0965;
+  width: 130px;
+  height: 34px;
   font-size: 20px;
   font-weight: 600;
-  background-color: #ffffff;
   border: none;
-  border: 2px solid #bd0965;
   border-radius: 5px;
   margin: 0px 30px 30px 0px;
+  transition: all 0.125s ease-in 0s;
   cursor: pointer;
 
-  &:hover {
-    /* color: #bd0965; */
-    color: #ffffff;
-    background-color: #bd0965;
-    /* border: 2px solid #bd0965; */
-    border-radius: 5px;
-    /* transition: all 0.125s ease-in 0s; */
-  }
+  ${({ variant }) => {
+    switch (variant) {
+      case false:
+        return `
+        color: #bd0965;
+        background-color: #ffffff;
+        border: 2px solid #bd0965;
+        `;
+      case true:
+        return `
+        color: #ffffff;
+        background-color: #bd0965;
+        `;
+      default:
+        return "";
+    }
+  }}
 `;
 
 export default MyPage;

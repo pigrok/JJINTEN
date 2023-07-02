@@ -6,15 +6,15 @@ import { styled } from "styled-components";
 import { BiCategory, BiChevronLeftSquare } from "react-icons/bi";
 import { FaMapPin, FaHouseFlag } from "react-icons/fa6";
 
-const MyPost = () => {
-  const [posts, setPosts] = useState([]);
+const MyLikePost = () => {
+  const [likePosts, setLikePosts] = useState([]);
 
   const params = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
-      const q = query(collection(db, "posts"), where("uid", "==", params.id));
+      const q = query(collection(db, "posts"), where("likePeople", "array-contains", params.id));
       const querySnapshot = await getDocs(q);
 
       const initArray = [];
@@ -25,8 +25,7 @@ const MyPost = () => {
           ...doc.data(),
         };
         initArray.push(data);
-        console.log(data);
-        setPosts(initArray);
+        setLikePosts(initArray);
       });
     };
     fetchData();
@@ -57,7 +56,7 @@ const MyPost = () => {
 
   return (
     <div>
-      {posts.map((post) => {
+      {likePosts.map((post) => {
         return (
           <PostContainer key={post.id}>
             <PostBox onClick={() => clickToDetail(post.id)}>
@@ -105,7 +104,6 @@ const PostCategory = styled.div`
   border-radius: 10px;
   font-size: 20px;
   text-align: center;
-
   display: flex;
   align-items: flex-start;
 `;
@@ -119,7 +117,7 @@ const PostBody = styled.span`
   color: #5b5b5b;
   font-size: 18px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  /* text-overflow: ellipsis; */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -135,8 +133,7 @@ const PostImg = styled.img`
   height: 160px;
   object-fit: cover;
   border-radius: 5px;
-  color: #575757;
-  margin: 15px;
+  margin: 10px;
 `;
 
-export default MyPost;
+export default MyLikePost;
