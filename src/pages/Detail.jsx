@@ -1,19 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, getDoc, addDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, updateDoc, where, addDoc } from "firebase/firestore";
 import shortid from "shortid";
 import { likeDB, unLikeDB, fetchLikeDB, didIPressed } from "../util/like";
 import { like, unlike, fetchLike } from "../redux/modules/like";
 import { db } from "../firebase";
 import { deletePost, setPosts, updatePost } from "../redux/modules/posts";
 import { addComments, setComments } from "../redux/modules/comments";
-
 import Login from "../components/Login";
 import SignUp from "../components/SignUp";
 import { auth, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Comment from "../components/Comment";
+import { styled } from "styled-components";
+
+const TitleBarContainer = styled.div`
+  width: 100%;
+`;
+
+const TitleBar = styled.div`
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  background-color: #cccccc;
+`;
 
 function Detail() {
   // 로그인 및 회원가입 모달 띄우기
@@ -124,17 +136,17 @@ function Detail() {
         const docRef = querySnapshot.docs[0].ref;
         const updatedData = {
           category:
-            category === "category1"
-              ? "문화"
-              : category === "category2"
+            category === "콘서트"
+              ? "콘서트"
+              : category === "전시"
               ? "전시"
-              : category === "category3"
+              : category === "공연"
               ? "공연"
-              : category === "category4"
+              : category === "연극"
               ? "연극"
-              : category === "category5"
+              : category === "뮤지컬"
               ? "뮤지컬"
-              : category === "category6"
+              : category === "페스티벌"
               ? "페스티벌"
               : "",
           title: title,
@@ -263,77 +275,100 @@ function Detail() {
 
   const isPostCreatedByCurrentUser = user && post && user.uid === post.uid;
 
+  const processCreatedAt = (dateString) => {
+    const date = new Date(Date.parse(dateString));
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hour = date.getHours().toString();
+    const minute = date.getMinutes().toString();
+    const formattedDate = `${year}.${month}.${day}.${hour}.${minute}`;
+
+    return formattedDate;
+  };
+
   return (
     <div>
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>{modifiedDateCard(post)}</div>
-          <div style={{ marginRight: "550px" }}>
-            {isPostCreatedByCurrentUser ? (
-              <>
-                {edit ? (
-                  <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={updatePostHandler}>
-                    저장
-                  </button>
-                ) : (
-                  <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => setEdit(true)}>
-                    수정
-                  </button>
-                )}
-                <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={deletePostHandler}>
-                  삭제
-                </button>
-              </>
-            ) : (
-              <></>
-            )}
-            <div style={{ padding: "10px", margin: "10px", width: "1000px", height: "500px" }}>
-              <div style={{ border: "1px solid black" }}>
-                <p style={{ display: "flex", alignItems: "center" }}>
-                  category:{" "}
-                  {edit ? (
-                    <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                      <option value="category1">문화 </option>
-                      <option value="category2">전시</option>
-                      <option value="category3">공연</option>
-                      <option value="category4">연극</option>
-                      <option value="category5">뮤지컬</option>
-                      <option value="category6">페스티벌</option>
-                    </select>
-                  ) : (
-                    <p>{post?.category}</p>
-                  )}
-                </p>
-              </div>
+      <TitleBarContainer>
+        <TitleBar>
+          <div style={{ marginLeft: "200px", color: "#fdfdef" }}>
+            <div>
+              {edit ? (
+                <select value={category} onChange={(e) => setCategory(e.target.value)}>
+                  <option value="콘서트">콘서트 </option>
+                  <option value="전시">전시</option>
+                  <option value="공연">공연</option>
+                  <option value="연극">연극</option>
+                  <option value="뮤지컬">뮤지컬</option>
+                  <option value="페스티벌">페스티벌</option>
+                </select>
+              ) : (
+                <p>{post?.category}</p>
+              )}
             </div>
-            <div style={{ border: "1px solid black", textAlign: "center" }}>
-              <p>title: {post?.title}</p>
-              {edit && <input value={title} onChange={(e) => setTitle(e.target.value)} />}
-            </div>
-            {post && (
-              <div style={{ border: "1px solid black", marginTop: "20px", height: "400px" }}>
-                <p>body: {post.body}</p>
-                {edit && <textarea value={body} onChange={(e) => setBody(e.target.value)} />}
-
-                {post.fileURL && <img style={{ width: "300px", height: "300px" }} src={post.fileURL} />}
-                {edit && (
+            <div>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", fontSize: "30px" }}>
+                  {edit && <input style={{ width: "50%", height: "50px" }} value={title} onChange={(e) => setTitle(e.target.value)} />}
+                  {!edit && post?.title}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", margin: "5px 0 30px 5px" }}>
+                  <div style={{ marginRight: "10px" }}> by.{post?.writer}.</div>
+                  <div style={{ marginRight: "10px" }}>{processCreatedAt(modifiedDateCard(post))}</div>
                   <div>
-                    <input type="file" onChange={handleFileSelect} />
-                    <button onClick={handleUpload}>Upload</button>
+                    {" "}
+                    {isPostCreatedByCurrentUser ? (
+                      <>
+                        {edit ? (
+                          <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={updatePostHandler}>
+                            저장
+                          </button>
+                        ) : (
+                          <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={() => setEdit(true)}>
+                            수정
+                          </button>
+                        )}
+                        <button style={{ border: "1px solid #cccccc", width: "50px", height: "20px", backgroundColor: "transparent", color: "#fdfdef" }} onClick={deletePostHandler}>
+                          삭제
+                        </button>
+                      </>
+                    ) : (
+                      <></>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
-            )}
+            </div>
           </div>
+        </TitleBar>
+      </TitleBarContainer>
+      <div>
+        <div>
+          {post && (
+            <div style={{ border: "1px solid black", marginTop: "70px", width: "100%", height: "500px", whiteSpace: "pre-line" }}>
+              {edit && <textarea style={{ width: "100%", height: "600px" }} value={body} onChange={(e) => setBody(e.target.value)} />}
+              {!edit && (
+                <>
+                  {post.fileURL && <img style={{ width: "300px", height: "300px" }} src={post.fileURL} />}
+                  <br />
+                  {post?.body}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+        <div>
+          {edit && (
+            <div>
+              <input type="file" onChange={handleFileSelect} />
+              <button onClick={handleUpload}>Upload</button>
+            </div>
+          )}
         </div>
       </div>
       <div>
-        {" "}
-        <br />
-        <br />
-        <br />
         <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }}>
           <form onSubmit={handleCommentSubmit}>
             <h3>댓글</h3>
