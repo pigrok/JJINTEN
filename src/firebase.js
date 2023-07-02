@@ -7,14 +7,15 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
 const firebaseConfig = {
-  apiKey: "AIzaSyB6BWgI8rUIVukoBeD45ZxGWoCkWMP_lvA",
-  authDomain: "jjinten-f5e17.firebaseapp.com",
-  projectId: "jjinten-f5e17",
-  storageBucket: "jjinten-f5e17.appspot.com",
-  messagingSenderId: "858216545129",
-  appId: "1:858216545129:web:f6f6abe69a3ee121521bf8",
-  measurementId: "G-EDP8F3N6S5",
+  apiKey: "AIzaSyA5XlWsgf5drHjHxlwggx2Ut3ugiYzOexw",
+  authDomain: "jjinten-a738a.firebaseapp.com",
+  projectId: "jjinten-a738a",
+  storageBucket: "jjinten-a738a.appspot.com",
+  messagingSenderId: "765825052979",
+  appId: "1:765825052979:web:7207a980831be364870e46",
+  measurementId: "G-9GC5PVYZQJ",
 };
 
 // Initialize Firebase
@@ -25,7 +26,6 @@ export const storage = getStorage(app);
 //social Logins
 export const signInWithGoogle = () => {
   const googleProvider = new GoogleAuthProvider();
-
   return signInWithPopup(auth, googleProvider);
 };
 export const signInWithGithub = () => {

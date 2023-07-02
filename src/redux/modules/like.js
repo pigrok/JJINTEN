@@ -12,10 +12,13 @@ const initialState = 0;
 const likeReducer = (state = initialState, action) => {
   switch (action.type) {
     case LIKE: {
+      console.log("like눌림");
       return state + 1;
     }
-    case UNLIKE:
+    case UNLIKE: {
+      console.log("like눌림");
       return state - 1;
+    }
     case FETCHLIKE: {
       return action.payload;
     }
