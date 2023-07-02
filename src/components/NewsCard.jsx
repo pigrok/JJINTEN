@@ -1,7 +1,6 @@
 import React from "react";
 import { styled } from "styled-components";
-import logoPic from "../assets/logo_nuki.png";
-import testImage1 from "../assets/random1000/test (1).png";
+import logoPic from "../assets/logo.png";
 import { useSelector } from "react-redux";
 
 function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isModified, updatedAt, fileURL }) {

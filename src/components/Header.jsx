@@ -5,9 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Login from "./Login";
 import SignUp from "./SignUp";
-import { logOutSuccess } from "../redux/modules/auth";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
 
 function Header() {
   const state = useSelector((state) => state.auth);
@@ -27,16 +24,6 @@ function Header() {
     navigate(`/mypage/${user.uid}`);
   };
 
-  const handleLogout = async (event) => {
-    event.preventDefault();
-
-    await signOut(auth);
-    dispatch(logOutSuccess());
-  };
-
-  const toggleButtons = () => {
-    setShowButtons(!showButtons);
-  };
   // 로그인 모달 열기
   const [loginModal, setLoginModal] = useState(false);
   const [signUpModal, setSignUpModal] = useState(false);
@@ -48,37 +35,33 @@ function Header() {
   };
 
   return (
-    <HeaderWrapper>
-      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+    <>
       <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <HeaderContainer>
-        <LeftSection>
-          <a href="/">
-            <ImgBox>
-              <LogoImg src={logoPic} />
-            </ImgBox>
-          </a>
-          <LogoSpan>JJINTEN</LogoSpan>
-        </LeftSection>
-        <RightSection>
-          {state.user ? (
-            <ProfileContainer>
-              <span>{user.displayName}님</span>
-              <ProfileImg src={user.photoURL} alt="Uploaded" />
-              <span style={{ fontSize: "20px" }} onClick={toggleButtons}>
-                ▾
-              </span>
-              <div>
-                <button onClick={clickToMyPage}>마이페이지</button>
-                <button onClick={handleLogout}>로그아웃</button>
-              </div>
-            </ProfileContainer>
-          ) : (
-            <div onClick={openLoginModal}>로그인 해주세요</div>
-          )}
-        </RightSection>
-      </HeaderContainer>
-    </HeaderWrapper>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <HeaderWrapper>
+        <HeaderContainer>
+          <LeftSection onClick={clickToMainPage}>
+            <a href="/">
+              <ImgBox>
+                <LogoImg src={logoPic} />
+              </ImgBox>
+            </a>
+            <LogoSpan>JJINTEN</LogoSpan>
+          </LeftSection>
+          <RightSection>
+            {state.user ? (
+              <ProfileContainer onClick={clickToMyPage}>
+                <span>{user.displayName}님</span>
+                <ProfileImg src={user.photoURL} alt="Uploaded" />
+                {/* <span style={{ fontSize: "20px" }}>▾</span> */}
+              </ProfileContainer>
+            ) : (
+              <div onClick={openLoginModal}>로그인 해주세요</div>
+            )}
+          </RightSection>
+        </HeaderContainer>
+      </HeaderWrapper>
+    </>
   );
 }
 
