@@ -7,8 +7,9 @@ import { likeDB, unLikeDB, fetchLikeDB, didIPressed } from "../util/like";
 import { like, unlike, fetchLike } from "../redux/modules/like";
 import { db } from "../firebase";
 import { deleteTodo, setTodos, updateTodo } from "../redux/modules/todos";
+import { addComment } from "../util/comment";
 import { addComments, setComments } from "../redux/modules/comments";
-
+import { increaseViewDB } from "../util/post";
 function Detail() {
   const todos = useSelector((state) => state.todos);
   const comments = useSelector((state) => state.comments);
@@ -27,33 +28,32 @@ function Detail() {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    async function fetchLikeAsync() {
-      const fetchedlike = await fetchLikeDB(id);
-      dispatch(fetchLike(fetchedlike.likeNumber));
-      setIsLike(didIPressed(fetchedlike.likePeople, user.uid));
+  async function fetchLikeAsync() {
+    const fetchedlike = await fetchLikeDB(id);
+    dispatch(fetchLike(fetchedlike.likeNumber));
+    setIsLike(didIPressed(fetchedlike.likePeople, user ? user.uid : null));
+  }
+  async function fetchData() {
+    try {
+      const querySnapshot = await getDocs(collection(db, "posts"));
+      const todos = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        const createdAt = data.createdAt;
+        return { id: doc.id, ...data, createdAt };
+      });
+      dispatch(setTodos(todos));
+    } catch (error) {
+      console.log(error);
     }
-    const fetchData = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "todos"));
-        const todos = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          const createdAt = data.createdAt;
-          return { id: doc.id, ...data, createdAt };
-        });
-        dispatch(setTodos(todos));
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  }
+  async function increaseView() {
+    await increaseViewDB(id);
+  }
+  useEffect(() => {
     fetchLikeAsync();
     fetchData();
+    increaseView();
   }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(setTodos(todos));
-  }, [dispatch, todos]);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -72,11 +72,7 @@ function Detail() {
     };
 
     fetchComments();
-  }, [dispatch, id]);
-
-  useEffect(() => {
-    dispatch(setComments(comments));
-  }, [dispatch, comments]);
+  }, [dispatch]);
 
   const deleteTodoHandler = async () => {
     try {
@@ -128,6 +124,7 @@ function Detail() {
   };
 
   const onClickLike = async (e) => {
+    if (!user) return;
     e.preventDefault();
     const userId = user.uid;
     const todoId = id;
@@ -137,6 +134,7 @@ function Detail() {
     }
   };
   const onClickUnLike = async (e) => {
+    if (!user) return;
     e.preventDefault();
     const userId = user.uid;
     const todoId = id;
@@ -147,45 +145,25 @@ function Detail() {
   };
   const handleCommentSubmit = async (event) => {
     event.preventDefault();
-
     if (!contents) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
     }
-
-    try {
-      const data = {
-        id: shortid.generate(),
-        contents: contents,
-        updatedAt: new Date().toString(),
-        isModified: true,
-        postId: todo.id,
-        uid: user.uid,
-        writer: user.displayName,
-        profile: user.photoURL,
-      };
-
-      await addDoc(collection(db, "comments"), data);
-
-      // Firebase에 댓글 추가 후에 새로운 댓글 목록을 가져와서 Redux 상태를 업데이트
-      // dispatch(fetchComments());
-      console.log("comments before dispatch:", data);
-      dispatch(addComments(data));
-
-      setName("");
-      setContents("");
-    } catch (error) {
-      console.error("데이터 추가 에러:", error);
-    }
+    const data = {
+      id: shortid.generate(),
+      contents: contents,
+      updatedAt: new Date().toString(),
+      isModified: true,
+      postId: todo.id,
+      uid: user.uid,
+      writer: user.displayName,
+      profile: user.photoURL,
+    };
+    await addComment(id, data);
+    setName("");
+    setContents("");
+    dispatch(addComments(data));
   };
-
-  // const handleCommentDelete = (commentId) => {
-  //   // 삭제할 댓글의 ID를 제외한 나머지 댓글들로 새로운 배열을 생성하여 업데이트
-  //   const updatedComments = comments.filter((comment) => comment.id !== commentId);
-
-  //   // 업데이트된 댓글 배열을 Redux 상태에 반영
-  //   dispatch(setComments(updatedComments));
-  // };
 
   const modifiedDateCard = (todo) => {
     if (todo && todo.isModified) {

@@ -33,12 +33,12 @@ function Form({ formModal, setFormModal }) {
         createdAt: new Date().toString(),
         isModified: false,
         uid: state.uid,
-      };
-      await addDoc(collection(db, "todos"), data);
-      await setDoc(doc(db, "likes", data.id), {
+        views: 0,
+        commentNumber: 0,
         likeNumber: 0,
         likePeople: [],
-      });
+      };
+      await addDoc(collection(db, "posts"), data);
       dispatch(addTodo(data));
       // 입력 필드 초기화
       setCategory("");

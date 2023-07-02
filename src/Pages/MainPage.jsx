@@ -12,15 +12,10 @@ function MainPage() {
   const [loginModal, setLoginModal] = useState(false);
   const [signUpModal, setSignUpModal] = useState(false);
   const [formModal, setFormModal] = useState(false);
-
+  const [sortBy, setSortBy] = useState("title");
+  const [searchInputValue, setSearchInputValue] = useState("");
+  const [searchText, setSearchText] = useState("");
   const category = ["문화", "전시", "공연", "연극", "뮤지컬", "페스티벌"];
-
-  // 로그인 모달 열기
-  const openLoginModal = () => {
-    if (!state.user) {
-      setLoginModal(true);
-    }
-  };
 
   // 글쓰기 모달 열기
   const openFormModal = () => {
@@ -30,9 +25,18 @@ function MainPage() {
       setFormModal(true);
     }
   };
-  const sortByView = () => {};
-  const sortByLike = () => {};
-  const sortByComment = () => {};
+  const onChangeSearch = (e) => {
+    setSearchInputValue(e.target.value);
+  };
+  const sortByView = () => {
+    setSortBy("views");
+  };
+  const sortByLike = () => {
+    setSortBy("likeNumber");
+  };
+  const sortByComment = () => {
+    setSortBy("commentNumber");
+  };
   return (
     <MainPageWrapper>
       <Signup signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
@@ -47,13 +51,21 @@ function MainPage() {
       <RightContainer>
         <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
         <Form formModal={formModal} setFormModal={setFormModal} />
+        <input onChange={onChangeSearch} value={searchInputValue} />
+        <button
+          onClick={() => {
+            setSearchText(searchInputValue);
+          }}
+        >
+          검색
+        </button>
         <SortSection>
-          <SortButton>조회수순</SortButton>
-          <SortButton>좋아요순</SortButton>
-          <SortButton>댓글순</SortButton>
+          <SortButton onClick={sortByView}>조회수순</SortButton>
+          <SortButton onClick={sortByLike}>좋아요순</SortButton>
+          <SortButton onClick={sortByComment}>댓글순</SortButton>
         </SortSection>
         <CardSection>
-          <NewsCardContainer />
+          <NewsCardContainer sortBy={sortBy} searchText={searchText} />
         </CardSection>
       </RightContainer>
     </MainPageWrapper>
@@ -62,7 +74,7 @@ function MainPage() {
 
 const MainPageWrapper = styled.div`
   display: grid;
-  grid-template-columns: 100px minmax(400px, 1250px) 50px;
+  grid-template-columns: 100px minmax(300px, 1250px) 50px;
 `;
 const LeftContainer = styled.div`
   -webkit-box-align: center;
