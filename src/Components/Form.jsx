@@ -28,7 +28,7 @@ function Form({ formModal, setFormModal }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${selectedFile}`);
+    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${shortid.generate()}_${selectedFile.name}`);
     await uploadBytes(imageRef, selectedFile);
 
     const fileURL = await getDownloadURL(imageRef);
@@ -51,6 +51,7 @@ function Form({ formModal, setFormModal }) {
         uid: state.uid,
         likeNumber: 0,
         likePeople: [],
+        views: 0,
         writer: user.displayName,
       };
       await addDoc(collection(db, "posts"), data);

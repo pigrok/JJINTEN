@@ -7,6 +7,8 @@ import { useSelector } from "react-redux";
 function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isModified, updatedAt, fileURL }) {
   const user = useSelector((state) => state.auth.user);
 
+  console.log(writer);
+
   const cardOnClick = () => {
     onClickFunc();
   };
