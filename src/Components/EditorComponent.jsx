@@ -5,6 +5,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, storage } from "../firebase";
 import shortid from "shortid";
 import "./EditorComponent.css";
+
 function EditorComponent({ setBody, setSelectedFile, initData = "<p>This is some sample content.</p>" }) {
   const editorRef = useRef();
   const [isFirstPicSelected, setIsFirstPicSelected] = useState(false);

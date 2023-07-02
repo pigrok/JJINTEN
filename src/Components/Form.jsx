@@ -143,7 +143,7 @@ const StModalContent = styled.div`
   background-color: #fff;
   padding: 20px;
   width: 700px;
-  height: 600px;
+  height: 620px;
   border-radius: 10px;
 `;
 

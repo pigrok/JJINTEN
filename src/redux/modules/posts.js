@@ -2,7 +2,6 @@ const ADD_POST = "posts/ADD_POST";
 const DELETE_POST = "posts/DELETE_POST";
 const UPDATE_POST = "posts/UPDATE_POST";
 const SET_POSTS = "posts/SET_POSTS";
-const UPLOAD_FILE = "posts/UPLOAD_FILE";
 
 export const addPost = (post) => ({
   type: ADD_POST,
@@ -40,9 +39,6 @@ const posts = (state = initialState, action) => {
       return state.map((post) => (post.id === action.payload.id ? action.payload : post));
 
     case SET_POSTS:
-      return action.payload;
-
-    case UPLOAD_FILE:
       return action.payload;
 
     default:

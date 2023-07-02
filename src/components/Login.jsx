@@ -148,7 +148,7 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
               <StButton backgroundColor="white" border="#BD0965 1px solid" color="#BD0965" onClick={signUpButtonHandler}>
                 회원가입
               </StButton>
-              <div style={{ marginTop: "20px", marginBottom: "15px" }}>소셜로 가입하기</div>
+              <div style={{ marginTop: "20px", marginBottom: "15px" }}>소셜로 로그인하기</div>
               <SocialButton onClick={handleGoogleLogin}>
                 <img style={{ width: "44px", height: "44px", margin: "10px" }} src={googleLogo} />
               </SocialButton>

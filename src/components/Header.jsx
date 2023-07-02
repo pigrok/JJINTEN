@@ -8,6 +8,8 @@ import SignUp from "./SignUp";
 import { signOut } from "firebase/auth";
 import { logOutSuccess } from "../redux/modules/auth";
 import { auth } from "../firebase";
+import { FaAngleDown } from "react-icons/fa";
+import Form from "./Form";
 
 function Header() {
   const state = useSelector((state) => state.auth);
@@ -19,8 +21,9 @@ function Header() {
   const [signUpModal, setSignUpModal] = useState(false);
   // 로고 애니메이션
   const [displayLogo, setDisplayLogo] = useState(false);
-
   const [showButtons, setShowButtons] = useState(false);
+  // 글쓰기 모달
+  const [formModal, setFormModal] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -40,6 +43,7 @@ function Header() {
     dispatch(logOutSuccess());
   };
 
+  // 로그인 모달 열기
   const openLoginModal = () => {
     if (!state.user) {
       setLoginModal(true);
@@ -57,10 +61,21 @@ function Header() {
     }, 3000);
   }, []);
 
+  // 글쓰기 모달 열기
+  const openFormModal = () => {
+    if (!state.user) {
+      setLoginModal(true);
+    } else {
+      setFormModal(true);
+    }
+  };
+
   return (
     <>
+      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <Form formModal={formModal} setFormModal={setFormModal} />
       <HeaderWrapper>
-        <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
         <HeaderContainer>
           <LeftSection>
             {displayLogo ? (
@@ -72,11 +87,12 @@ function Header() {
             )}
           </LeftSection>
           <RightSection>
+            <WriteSection onClick={openFormModal}>게시글 작성</WriteSection>
             {state.user ? (
               <ProfileContainer onClick={() => setIsOpen((prev) => !prev)}>
-                <span>{user.displayName}님</span>
+                <span>{user.displayName} 님</span>
                 <ProfileImg src={user.photoURL} alt="Uploaded" />
-                <span style={{ fontSize: "20px" }}>▾</span>
+                <FaAngleDown />
                 {isOpen && (
                   <ProfileMenu>
                     <li>
@@ -89,7 +105,9 @@ function Header() {
                 )}
               </ProfileContainer>
             ) : (
-              <div onClick={openLoginModal}>로그인 해주세요</div>
+              <div onClick={openLoginModal} style={{ marginRight: "80px" }}>
+                로그인 해주세요
+              </div>
             )}
           </RightSection>
         </HeaderContainer>
@@ -101,14 +119,14 @@ function Header() {
 export default Header;
 
 const HeaderWrapper = styled.div`
-  margin-top: 40px;
-  margin-bottom: 40px;
+  margin-top: 10px;
   width: 100%;
-  text-align: -webkit-center;
+  border-bottom: 1px solid #e6e6e6;
 `;
 const HeaderContainer = styled.div`
   width: 95%;
   height: 70px;
+  margin-bottom: 10px;
   display: flex;
   -webkit-box-align: center;
   align-items: center;
@@ -121,6 +139,7 @@ const LeftSection = styled.div`
   align-items: center;
   position: relative;
   cursor: pointer;
+  margin-left: 80px;
 `;
 const RightSection = styled.div`
   display: flex;
@@ -129,8 +148,8 @@ const RightSection = styled.div`
   position: relative;
 `;
 const ImgBox = styled.div`
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   margin: 0 auto;
 `;
 const LogoImg = styled.img`
@@ -145,6 +164,8 @@ const ProfileContainer = styled.div`
   position: relative;
   height: 80%;
   font-size: 18px;
+  font-weight: bold;
+  margin-right: 80px;
 `;
 const ProfileImg = styled.img`
   margin: 5px;
@@ -152,7 +173,7 @@ const ProfileImg = styled.img`
   height: 50px;
   object-fit: cover;
   border-radius: 50% 50%;
-  margin-left: 10px;
+  margin-left: 20px;
 `;
 
 const ProfileMenu = styled.ul`
@@ -172,10 +193,28 @@ const ProfileMenu = styled.ul`
 const ProfileMenuBtn = styled.button`
   width: 100%;
   font-size: 18px;
-  text-align: left;
+  text-align: center;
   line-height: 40px;
   border: none;
   background-color: #ffffff;
   padding: 10px;
   cursor: pointer;
+`;
+
+const WriteSection = styled.button`
+  width: 120px;
+  height: 40px;
+  margin-right: 30px;
+  cursor: pointer;
+  color: #bd0965;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 25px;
+  background-color: #fff;
+  border: 2px solid #bd0965;
+
+  &:hover {
+    background-color: #bd0965;
+    color: #fff;
+  }
 `;
