@@ -17,15 +17,6 @@ const MyPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const logOut = async (event) => {
-    event.preventDefault();
-
-    navigate("/");
-
-    await signOut(auth);
-    dispatch(logOutSuccess());
-  };
-
   const onChangeHandler = (event) => {
     const {
       target: { name, value },
@@ -80,76 +71,184 @@ const MyPage = () => {
     const day = date.getDate().toString().padStart(2, "0");
     const hour = date.getHours().toString();
     const minute = date.getMinutes().toString();
-    const formattedDate = `${year}년${month}월${day}일 ${hour}시${minute}분`;
+    const formattedDate = `${year}년 ${month}월 ${day}일 ${hour}시${minute}분`;
 
     return formattedDate;
   };
 
   return (
-    <main
-      style={{
-        border: "1px solid black",
-        margin: "10px",
-        padding: "10px",
-      }}
-    >
-      <button onClick={logOut}>로그아웃</button>
-      <p></p>
-      <button onClick={editToggle}>프로필 수정</button>
+    <ProfileWrapper>
       <ProfileContainer>
-        <div>
-          <ProfilePic src={user.photoURL} alt="Uploaded" />
-          {edit && <FileUpload edit={edit} setEdit={setEdit} />}
-        </div>
-        <ProfileInfo>
-          {edit ? (
-            <form>
-              닉네임 : <input value={newDisplayName} onChange={onChangeHandler} name="newDisplayName" type="text" placeholder="닉네임 ..." autoComplete="off"></input>
-              {/* <input type="submit" value="Update DisplayName"></input> */}
-            </form>
-          ) : (
-            <p>닉네임 : {user.displayName}</p>
-          )}
-          <p>이메일 : {user.email}</p>
-          {edit ? (
-            <form>
-              한 줄 소개 : <input value={note} onChange={onChangeHandler} name="note" type="text" placeholder="한 줄 소개 ..." autoComplete="off"></input>
-              {/* <input type="submit" value="Update Note"></input> */}
-              <br />
-              <button onClick={profileEditHandler}>저장</button>
-            </form>
-          ) : (
-            <p>한 줄 소개 : {user.note}</p>
-          )}
-          <p>마지막 로그인 시간 : {processCreatedAt(user.lastSignTime)}</p>
-        </ProfileInfo>
+        <ProfileEditBtn onClick={editToggle}>{!edit ? "수정" : "취소"}</ProfileEditBtn>
+        <ProfileBox>
+          <ProfilePicBox>
+            <ProfilePic src={user.photoURL} alt="Uploaded" />
+            {edit && <FileUpload edit={edit} setEdit={setEdit} />}
+          </ProfilePicBox>
+          <ProfileInfo>
+            {edit ? (
+              <p>
+                <form>
+                  Nickname : <ProfileInfoInput value={newDisplayName} onChange={onChangeHandler} name="newDisplayName" type="text" autoComplete="off" />
+                </form>
+              </p>
+            ) : (
+              <p>
+                Nickname : <ProfileInfoValue>{user.displayName}</ProfileInfoValue>
+              </p>
+            )}
+            <p>
+              E-mail : <ProfileInfoValue>{user.email}</ProfileInfoValue>
+            </p>
+            {edit ? (
+              <p>
+                <form>
+                  Comment : <ProfileInfoInput value={note} onChange={onChangeHandler} name="note" type="text" autoComplete="off" />
+                  {edit && <InfoUploadBtn onClick={profileEditHandler}>내용 저장</InfoUploadBtn>}
+                </form>
+              </p>
+            ) : (
+              <p>
+                Comment : <ProfileInfoValue>{user.note}</ProfileInfoValue>
+              </p>
+            )}
+            <p>Last Login Time : {processCreatedAt(user.lastSignTime)}</p>
+          </ProfileInfo>
+        </ProfileBox>
       </ProfileContainer>
-      <h2>내가 작성한 게시글</h2>
-      <MyPost />
-      <h2>내가 좋아요한 게시글</h2>
-    </main>
+      <MyPostContainer>
+        <div>
+          <MyPostBtn>작성글</MyPostBtn>
+          <MyPostBtn>좋아요한 글</MyPostBtn>
+        </div>
+        <MyPost />
+      </MyPostContainer>
+    </ProfileWrapper>
   );
 };
 
+const ProfileWrapper = styled.div`
+  margin-top: 50px;
+`;
+
 const ProfileContainer = styled.div`
+  position: relative;
+  width: 740px;
+  height: 350px;
+  /* background-color: #e7e7e7a9; */
+  border: 1px solid #e1e1e1e0;
+  border-radius: 5px;
+  box-shadow: 3px 3px 10px #cdcdcddf;
+  margin: 0 auto;
+  padding: 10px;
+`;
+
+const ProfileEditBtn = styled.button`
+  position: absolute;
+  top: 5%;
+  right: 3%;
+  width: 70px;
+  height: 40px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  background-color: #bd0965;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #7e144b;
+    transition: all 0.125s ease-in 0s;
+  }
+`;
+
+const ProfileBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10rem;
+`;
+
+const ProfilePicBox = styled.div`
+  padding-right: 50px;
+  margin-top: 45px;
 `;
 
 const ProfilePic = styled.img`
-  width: 400px;
-  height: 400px;
+  width: 240px;
+  height: 240px;
   object-fit: cover;
-  border-radius: 20px;
+  border-radius: 50%;
+  margin-bottom: 10px;
 `;
 
 const ProfileInfo = styled.div`
-  width: 400px;
-  height: 400px;
-  background-color: #dfdfdf;
-  border-radius: 20px;
+  line-height: 30px;
+  color: #787878;
+  border-left: 2px solid #c2c2c2;
+  font-size: 15px;
+  padding-left: 33px;
+  margin-top: 33px;
+`;
+
+const ProfileInfoInput = styled.input`
+  width: 180px;
+  border: 1px solid #c1c1c1;
+  border-radius: 10px;
+  padding: 8px;
+  margin-left: 5px;
+`;
+
+const ProfileInfoValue = styled.span`
+  color: #000000;
+  font-size: 22px;
+  font-weight: 500;
+`;
+
+const InfoUploadBtn = styled.button`
+  position: absolute;
+  right: 3%;
+  bottom: 7%;
+  width: 62px;
+  height: 28px;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  background-color: #747474;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #3b3b3b;
+  }
+`;
+
+const MyPostContainer = styled.div`
+  margin: 70px 50px 0px 50px;
+`;
+
+const MyPostBtn = styled.button`
+  width: 120px;
+  height: 33px;
+  color: #bd0965;
+  font-size: 20px;
+  font-weight: 600;
+  background-color: #ffffff;
+  border: none;
+  border: 2px solid #bd0965;
+  border-radius: 5px;
+  margin: 0px 30px 30px 0px;
+  cursor: pointer;
+
+  &:hover {
+    /* color: #bd0965; */
+    color: #ffffff;
+    background-color: #bd0965;
+    /* border: 2px solid #bd0965; */
+    border-radius: 5px;
+    /* transition: all 0.125s ease-in 0s; */
+  }
 `;
 
 export default MyPage;
