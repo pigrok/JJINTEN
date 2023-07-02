@@ -50,16 +50,13 @@ function Form({ formModal, setFormModal }) {
         isModified: false,
         fileURL: fileURL,
         uid: state.uid,
+        views: 0,
+        commentNumber: 0,
         likeNumber: 0,
         likePeople: [],
-        views: 0,
         writer: user.displayName,
       };
       await addDoc(collection(db, "posts"), data);
-      await setDoc(doc(db, "likes", data.id), {
-        likeNumber: 0,
-        likePeople: [],
-      });
 
       dispatch(addPost(data));
       // 입력 필드 초기화
@@ -83,7 +80,6 @@ function Form({ formModal, setFormModal }) {
       {formModal ? (
         <StModalBox>
           <StModalContent>
-            {/* <h2 style={{ margin: "10px" }}>게시글 작성</h2> */}
             <form onSubmit={handleSubmit}>
               <div>
                 <StSelectBox value={category} onChange={(e) => setCategory(e.target.value)}>

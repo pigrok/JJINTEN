@@ -8,10 +8,12 @@ const Button = styled.button`
   font-weight: bold;
   border-radius: 20px 20px 20px 20px;
   transition: all 0.125s ease-in 0s;
-  background-color: #ffffff;
+  background-color: #cd36be;
+  color: white;
   &:hover {
-    background: #212529;
-    color: #ffffff;
+    background: #8d1f82;
+    /* background: #212529; */
+    color: #000000;
   }
 `;
 

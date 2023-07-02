@@ -15,6 +15,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "firebase": "^9.23.0",
     "firestore": "^1.1.6",
+    "intersection-observer": "^0.12.2",
     "package": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

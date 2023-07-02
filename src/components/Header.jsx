@@ -103,6 +103,8 @@ function Header() {
 export default Header;
 
 const HeaderWrapper = styled.div`
+  margin-top: 40px;
+  margin-bottom: 40px;
   width: 100%;
   text-align: -webkit-center;
 `;
