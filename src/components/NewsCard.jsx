@@ -15,6 +15,12 @@ function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isMod
     return formattedDate;
   };
 
+  const processBody = (bodyStr) => {
+    let result = "";
+    result = bodyStr.replace(/\n/g, "").replace(/<[^>]*>?/g, "");
+    return result;
+  };
+
   const modifiedDate = () => {
     if (isModified) {
       return updatedAt;
@@ -35,7 +41,7 @@ function NewsCard({ createdAt, category, title, body, writer, onClickFunc, isMod
           {isModified ? <NewsEmojiInfos style={{ gridColumn: "7/8", gridRow: "1" }}>(수정됨)</NewsEmojiInfos> : <></>}
           <NewsCategory style={{ gridColumn: "1/8", gridRow: "2" }}>{category}</NewsCategory>
           <NewsTitle style={{ gridColumn: "1/8", gridRow: "3" }}>{title}</NewsTitle>
-          <NewsDesc style={{ gridColumn: "1/8", gridRow: "4/6" }}>{body}</NewsDesc>
+          <NewsDesc style={{ gridColumn: "1/8", gridRow: "4/6" }}>{processBody(body)}</NewsDesc>
           <NewsEmojiInfos style={{ gridColumn: "1/4", gridRow: "6" }}>조회수:{views}</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "4/6", gridRow: "6" }}>{commentNumber}개의 댓글</NewsEmojiInfos>
           <NewsEmojiInfos style={{ gridColumn: "6/8", gridRow: "6" }}>♥: {like}</NewsEmojiInfos>

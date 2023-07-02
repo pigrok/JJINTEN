@@ -49,6 +49,12 @@ const MyPost = () => {
     return formattedDate;
   };
 
+  const processBody = (bodyStr) => {
+    let result = "";
+    result = bodyStr.replace(/\n/g, "").replace(/<[^>]*>?/g, "");
+    return result;
+  };
+
   return (
     <div>
       {posts.map((post) => {
@@ -61,7 +67,7 @@ const MyPost = () => {
                   {post.category}
                 </PostCategory>
                 <PostTitle>{post.title}</PostTitle>
-                <PostBody>{post.body}</PostBody>
+                <PostBody>{processBody(post.body)}</PostBody>
                 <PostInfo>
                   by. {post.writer} | {processCreatedAt(post.createdAt)}
                 </PostInfo>

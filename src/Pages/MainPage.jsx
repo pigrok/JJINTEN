@@ -13,12 +13,13 @@ import { GiTheaterCurtains } from "react-icons/gi";
 import { FaTheaterMasks } from "react-icons/fa";
 import { AiOutlinePicture } from "react-icons/ai";
 import { BsMusicNoteBeamed } from "react-icons/bs";
+import Footer from "../components/Footer";
+import { FiSearch } from "react-icons/fi";
 
 function MainPage() {
   const state = useSelector((state) => state.auth);
   const [loginModal, setLoginModal] = useState(false);
   const [signUpModal, setSignUpModal] = useState(false);
-  const [formModal, setFormModal] = useState(false);
   const [sortBy, setSortBy] = useState("createdAt");
   const [searchInputValue, setSearchInputValue] = useState("");
   const [searchText, setSearchText] = useState("");
@@ -33,14 +34,6 @@ function MainPage() {
     { category: "콘서트", icon: <PiMicrophoneStageDuotone size="40" /> },
   ];
 
-  // 글쓰기 모달 열기
-  const openFormModal = () => {
-    if (!state.user) {
-      setLoginModal(true);
-    } else {
-      setFormModal(true);
-    }
-  };
   const onChangeSearch = (e) => {
     setSearchInputValue(e.target.value);
   };
@@ -54,42 +47,44 @@ function MainPage() {
     setSortBy("commentNumber");
   };
   return (
-    <MainPageWrapper>
-      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <LeftContainer />
-      <MainPageContainer>
-        <LinkBanner />
-        <CategoryMenuBar>
-          {categories.map((c) => {
-            return (
-              <CategoryBox key={c.category} onClick={() => setCategory(c.category)}>
-                <CategoryItem>{c.icon}</CategoryItem>
-                <CategoryItem>{c.category}</CategoryItem>
-              </CategoryBox>
-            );
-          })}
-        </CategoryMenuBar>
-        <WriteSection onClick={openFormModal}>글쓰기✏️</WriteSection>
-        <Form formModal={formModal} setFormModal={setFormModal} />
-        <input onChange={onChangeSearch} value={searchInputValue} />
-        <button
+    <>
+      <SearchSection>
+        <InputBox placeholder="검색어를 입력해주세요" onChange={onChangeSearch} value={searchInputValue} />
+        <Stbutton
           onClick={() => {
             setSearchText(searchInputValue);
           }}
         >
-          검색
-        </button>
-        <SortSection>
-          <SortButton onClick={sortByView}>조회수순</SortButton>
-          <SortButton onClick={sortByLike}>좋아요순</SortButton>
-          <SortButton onClick={sortByComment}>댓글순</SortButton>
-        </SortSection>
-        <CardSection>
-          <NewsCardContainer category={category} sortBy={sortBy} searchText={searchText} />
-        </CardSection>
-      </MainPageContainer>
-    </MainPageWrapper>
+          <FiSearch />
+        </Stbutton>
+      </SearchSection>
+      <MainPageWrapper>
+        <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+        <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+        <LeftContainer></LeftContainer>
+        <RightContainer>
+          <LinkBanner></LinkBanner>
+          <CategoryMenuBar>
+            {categories.map((c) => {
+              return (
+                <CategoryBox key={c.category} onClick={() => setCategory(c.category)}>
+                  <CategoryItem>{c.icon}</CategoryItem>
+                  <CategoryItem>{c.category}</CategoryItem>
+                </CategoryBox>
+              );
+            })}
+          </CategoryMenuBar>
+          <SortSection>
+            <SortButton onClick={sortByView}>조회수순</SortButton>
+            <SortButton onClick={sortByLike}>좋아요순</SortButton>
+            <SortButton onClick={sortByComment}>댓글순</SortButton>
+          </SortSection>
+          <CardSection>
+            <NewsCardContainer category={category} sortBy={sortBy} searchText={searchText} />
+          </CardSection>
+        </RightContainer>
+      </MainPageWrapper>
+    </>
   );
 }
 
@@ -101,15 +96,14 @@ const LeftContainer = styled.div`
   /* -webkit-box-align: center;
   align-items: center;
   text-align: center; */
+  text-align: center;
 `;
 
-const MainPageContainer = styled.div`
+const RightContainer = styled.div`
+  /* display: inline; */
   width: 100%;
   /* grid-row-gap: 10px;
-  grid-template-rows: 30px 30px auto;
-  -webkit-box-align: center;
-  align-items: center; */
-  /* margin: 0 auto; */
+grid-template-rows: 30px 30px auto; */
 `;
 
 const CategoryMenuBar = styled.div`
@@ -135,21 +129,60 @@ const CategoryItem = styled.span`
   cursor: pointer;
 `;
 
-const WriteSection = styled(Button)`
-  width: 100%;
-`;
 const SortSection = styled.div`
-  height: 30px;
+  height: 45px;
   text-align: right;
+  margin-right: 5px;
 `;
+const SearchSection = styled.div`
+  height: 45px;
+  text-align: right;
+  margin-right: 170px;
+  margin-top: 10px;
+`;
+
 const CardSection = styled.div`
   height: auto;
   width: 100%;
   margin-top: 50px;
 `;
-const SortButton = styled(Button)`
-  margin-right: 5px;
+
+const InputBox = styled.input`
+  width: 130px;
+  height: 28px;
+  padding-left: 10px;
+  font-size: 14px;
+  display: inline-block;
+  border: none;
+  border-radius: 25px;
+  outline: none;
 `;
+
+const Stbutton = styled.button`
+  background-color: #fff;
+  border: none;
+  font-size: 20px;
+  margin-top: 5px;
+`;
+
+const SortButton = styled.button`
+  width: 70px;
+  height: 30px;
+  /* margin-right: 10px; */
+  cursor: pointer;
+  color: gray;
+  font-size: 14px;
+  border-radius: 25px;
+  background-color: #fff;
+  border: 1px solid gray;
+  margin: 40px 5px;
+
+  &:hover {
+    background-color: gray;
+    color: #fff;
+  }
+`;
+
 const GoUpButton = styled.button`
   width: 45px;
   height: 45px;

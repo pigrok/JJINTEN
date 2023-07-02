@@ -3,12 +3,12 @@ import MainPage from "../pages/MainPage";
 import MyPage from "../pages/MyPage";
 import Detail from "../pages/Detail";
 import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 const Router = () => {
   return (
     <div
       style={{
-        // maxWidth: "100%",
         maxWidth: "1400px",
         margin: "0 auto",
       }}
@@ -20,6 +20,7 @@ const Router = () => {
           <Route path="/:id" element={<Detail />} />
           <Route path="mypage/:id" element={<MyPage />} />
         </Routes>
+        <Footer />
       </BrowserRouter>
     </div>
   );

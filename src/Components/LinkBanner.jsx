@@ -35,7 +35,7 @@ const BannerContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   /* border: 1px solid black; */
 `;
 
@@ -45,9 +45,7 @@ const BannerImgBox = styled.div`
 `;
 
 const BannerImg = styled.img`
-  /* width: 35%;
-  height: 32%; */
   width: 360px;
   height: 110px;
-  padding: 15px 30px;
+  padding: 10px 30px;
 `;

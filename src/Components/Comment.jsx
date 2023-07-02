@@ -3,8 +3,10 @@ import { useDispatch } from "react-redux";
 import { collection, deleteDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { deleteComment, updateComment } from "../redux/modules/comments";
+import { styled } from "styled-components";
+import { commentDeleteHandlerDB } from "../util/comment";
 
-function Comment({ post, user, comment, comments, commentContents, id, commentId, updatedAt, isModified, postId, uid, writer, profile }) {
+function Comment({ post, user, comment, comments, commentContents, commentNumber, id, commentId, updatedAt, isModified, postId, uid, writer, profile }) {
   const [name, setName] = useState("");
   const [contents, setContents] = useState("");
   const [editContents, setEditContents] = useState(false);
@@ -12,21 +14,8 @@ function Comment({ post, user, comment, comments, commentContents, id, commentId
   const dispatch = useDispatch();
 
   const commentDeleteHandler = async (commentId) => {
-    try {
-      const q = query(collection(db, "comments"), where("id", "==", commentId));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const docRef = querySnapshot.docs[0].ref;
-        await deleteDoc(docRef);
-        dispatch(deleteComment(commentId));
-        alert("댓글이 삭제되었습니다.");
-      } else {
-        console.log("해당 id를 가진 문서를 찾을 수 없습니다.");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    await commentDeleteHandlerDB(commentId, postId);
+    dispatch(deleteComment(commentId));
   };
 
   const updateCommentHandler = async (commentId) => {
@@ -79,37 +68,92 @@ function Comment({ post, user, comment, comments, commentContents, id, commentId
   console.log("is", isPostCreatedByCurrentUser);
   console.log(comment);
 
+  const processCreatedAt = (dateString) => {
+    const date = new Date(Date.parse(dateString));
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hour = date.getHours().toString();
+    const minute = date.getMinutes().toString();
+    const formattedDate = `${year}.${month}.${day}.${hour}.${minute}`;
+
+    return formattedDate;
+  };
+
   return (
     <div>
-      <div style={{ border: "1px solid black", padding: "10px", margin: "10px" }} key={id}>
-        <img style={{ height: "50px", width: "50px" }} src={profile}></img>
-        <p>{writer}</p>
-        <p>content: {commentContents} </p>
-        <p>작성일자: {modifiedDateComment(comment)}</p>
-
-        {isPostCreatedByCurrentUser ? (
-          <>
-            {editContents ? (
-              <div>
-                <textarea value={contents} onChange={(e) => setContents(e.target.value)} style={{ width: "100%", minHeight: "100px", marginBottom: "10px" }} />
-                <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => updateCommentHandler(id)}>
-                  저장
-                </button>
-              </div>
-            ) : (
-              <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => setEditContents(true)}>
-                수정
-              </button>
-            )}
-            <button style={{ width: "100px", height: "50px", margin: "15px" }} onClick={() => commentDeleteHandler(id)}>
-              삭제
-            </button>
-          </>
-        ) : (
-          <></>
-        )}
+      <div key={id}>
+        <CommentBox style={{ display: "flex", alignItems: "center" }}>
+          <ProfileImg src={profile}></ProfileImg>
+          <CommentWriter>{writer}</CommentWriter>
+        </CommentBox>
+        <CommentDate>{commentContents} </CommentDate>
+        <div>
+          <p>{processCreatedAt(modifiedDateComment(post))}</p>
+          {isPostCreatedByCurrentUser ? (
+            <>
+              {editContents ? (
+                <div>
+                  <EditCommentTextarea value={contents} onChange={(e) => setContents(e.target.value)} />
+                </div>
+              ) : (
+                <></>
+              )}
+              {editContents ? (
+                <div>
+                  <FeatureButton onClick={() => updateCommentHandler(id)}>저장</FeatureButton>
+                </div>
+              ) : (
+                <div>
+                  <FeatureButton onClick={() => setEditContents(true)}>수정</FeatureButton>
+                  <FeatureButton onClick={() => commentDeleteHandler(id)}>삭제</FeatureButton>
+                </div>
+              )}
+            </>
+          ) : (
+            <></>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 export default Comment;
+
+const CommentBox = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const CommentWriter = styled.p`
+  margin: 15px;
+  font-size: 12px;
+`;
+
+const CommentDate = styled.p`
+  margin: 15px;
+  font-size: 12px;
+`;
+
+const EditCommentTextarea = styled.textarea`
+  width: 100%;
+  min-height: 100px;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+  font-size: 17px;
+`;
+
+const FeatureButton = styled.button`
+  border: 1px solid #ffffff;
+  width: 50px;
+  height: 20px;
+  background-color: transparent;
+`;
+
+const ProfileImg = styled.img`
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50% 50%;
+  margin-left: 10px;
+`;
