@@ -12,15 +12,11 @@ function Form({ formModal, setFormModal }) {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [downloadURL, setDownloadURL] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const user = useSelector((state) => state.auth.user);
-
   const state = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch();
-
-  // 사진 업로드
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileSelect = (event) => {
     setSelectedFile(event.target.files[0]);
@@ -28,13 +24,10 @@ function Form({ formModal, setFormModal }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const imageRef = ref(storage, `${auth.currentUser.uid}/form/${shortid.generate()}_${selectedFile}`);
-    await uploadBytes(imageRef, selectedFile);
-
-    const fileURL = await getDownloadURL(imageRef);
-    setDownloadURL(fileURL);
-
+    let fileURL = null;
+    if (selectedFile) {
+      fileURL = selectedFile;
+    }
     if (!title || !body || !category) {
       alert("필수값이 누락되었습니다. 확인해주세요.");
       return;
@@ -57,7 +50,7 @@ function Form({ formModal, setFormModal }) {
         writer: user.displayName,
       };
       await addDoc(collection(db, "posts"), data);
-
+      window.location.reload();
       dispatch(addPost(data));
       // 입력 필드 초기화
       setCategory("");
@@ -103,19 +96,20 @@ function Form({ formModal, setFormModal }) {
                   }}
                 />
               </div>
-              <div style={{ margin: "0px 10px 0px 10px" }}>
-                <EditorComponent
-                  // type="text"
+              <div>
+                <EditorComponent setBody={setBody} setSelectedFile={setSelectedFile} />
+                {/* <StBodyInput
+                  type="text"
                   name="body"
                   value={body}
                   onChange={(e) => {
                     setBody(e.target.value);
                   }}
-                />
+                /> */}
               </div>
-              {/* <div>
+              <div>
                 <input type="file" onChange={handleFileSelect} style={{ marginLeft: "10px" }} />
-              </div> */}
+              </div>
               <ButtonContainer>
                 <Stbutton marginRight="0px" onClick={cancelButtonHandler}>
                   취소

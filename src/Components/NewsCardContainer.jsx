@@ -11,7 +11,6 @@ function NewsCardContainer({ sortBy, searchText, category }) {
   const [isLoading, setIsLoading] = useState(false);
   const [dataLength, setDataLength] = useState(0);
   const isInitialRender = useRef(true);
-
   const increasePage = useCallback(() => {
     setPage((prev) => prev + 1);
   });
@@ -43,7 +42,7 @@ function NewsCardContainer({ sortBy, searchText, category }) {
       return [];
     });
     goBackPage();
-    await fetchDatas(sortBy, page);
+    await fetchDatas(sortBy, page, category);
     await sleep(1000);
     observe(ref.current);
   }
@@ -57,25 +56,29 @@ function NewsCardContainer({ sortBy, searchText, category }) {
     } else {
       isInitialRender.current = false;
     }
-  }, [sortBy]);
-  // useEffect(() => {
-  //   observer.unobserve(ref.current);
-  //   console.log("검색: 관찰풀음", observer);
-  //   const reg = new RegExp(searchText, "i");
-  //   let originPosts = [];
-  //   for (let i = 0; i < posts.length; i++) {
-  //     if (!reg.test(posts[i].title)) {
-  //       let tempObj = { ...posts[i] };
-  //       tempObj["isVisible"] = false;
-  //       originPosts.push(tempObj);
-  //     } else {
-  //       originPosts.push(posts[i]);
-  //     }
-  //   }
-  //   setPosts(originPosts);
-  //   observer.unobserve(ref.current);
-  //   console.log("검색: 관찰풀음", observer);
-  // }, [searchText]);
+  }, [sortBy, category]);
+  useEffect(() => {
+    unobserve(ref.current);
+    const reg = new RegExp(searchText, "i");
+    let allTruePosts = [];
+    for (let i = 0; i < posts.length; i++) {
+      let tempObj = { ...posts[i] };
+      tempObj["isVisible"] = true;
+      allTruePosts.push(tempObj);
+    }
+    let originPosts = [];
+    for (let i = 0; i < posts.length; i++) {
+      if (!reg.test(posts[i].title) && !reg.test(posts[i].body)) {
+        let tempObj = { ...posts[i] };
+        tempObj["isVisible"] = false;
+        originPosts.push(tempObj);
+      } else {
+        originPosts.push(allTruePosts[i]);
+      }
+    }
+    setPosts(originPosts);
+    unobserve(ref.current);
+  }, [searchText]);
   useEffect(() => {
     if (dataLength < 8) {
       console.log("관찰 풀음");
