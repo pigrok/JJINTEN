@@ -21,8 +21,7 @@ import { BsHeartFill } from "react-icons/bs";
 import { BsHeart } from "react-icons/bs";
 import { BiEditAlt } from "react-icons/bi";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import { LuSave } from "react-icons/lu";
-import { LuShare2, LuSiren } from "react-icons/lu";
+import { LuSave, LuShare2, LuSiren } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import EditorComponent from "../components/EditorComponent";
 
@@ -324,7 +323,7 @@ function Detail() {
         <Body>
           <div>
             {post && (
-              <div style={{ border: "1px solid black", marginTop: "70px", width: "100%", whiteSpace: "pre-line" }}>
+              <div style={{ marginBottom: "80px", width: "100%", whiteSpace: "pre-line" }}>
                 {!edit ? (
                   <div className="Description" dangerouslySetInnerHTML={{ __html: post.body }}></div>
                 ) : (
@@ -420,7 +419,7 @@ function Detail() {
                     updatedAt={comment.updatedAt}
                     isModified={comment.isModified}
                     commentContents={comment.contents}
-                    commentNumber={post.commentNumber}
+                    commentNumber={comment.commentNumber}
                   />
                   <Line2 />
                 </div>

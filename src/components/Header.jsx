@@ -173,7 +173,6 @@ const ProfileContainer = styled.div`
   height: 80%;
   font-size: 18px;
   font-weight: bold;
-  margin-right: 80px;
 `;
 const ProfileImg = styled.img`
   margin: 5px;
