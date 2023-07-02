@@ -56,6 +56,8 @@ function NewsCardContainer({ category }) {
     }
   };
 
+  console.log(posts);
+
   return (
     <NewsCardContinerWrapper>
       {posts.sort(compareDateCard).map((post) => {
@@ -71,6 +73,7 @@ function NewsCardContainer({ category }) {
             createdAt={post.createdAt}
             isModified={post.isModified}
             fileURL={post.fileURL}
+            // writer={post.writer}
           />
         );
       })}

@@ -1,9 +1,14 @@
 import React, { useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+// import { setContent } from "../redux/modules/posts";
+import styled from "styled-components";
 
 function EditorComponent() {
   const editorRef = useRef();
+  const content = useSelector((state) => state.content);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.editor) {
@@ -13,8 +18,13 @@ function EditorComponent() {
     }
   }, []);
 
+  // const handleEditorChange = (event, editor) => {
+  //   const data = editor.getData();
+  //   dispatch(setContent(data));
+  // };
+
   return (
-    <div>
+    <EditorWrapper>
       <CKEditor
         editor={ClassicEditor}
         config={
@@ -22,19 +32,19 @@ function EditorComponent() {
             // CKEditor 구성 옵션 설정 (선택사항)
           }
         }
-        onReady={(editor) => {
-          // 에디터가 준비되었을 때 호출되는 콜백 함수
-          editor.setData("<p>This is some sample content.</p>");
-        }}
-        onChange={(event, editor) => {
-          // 에디터 내용이 변경되었을 때 호출되는 콜백 함수
-          const data = editor.getData();
-          console.log(data);
-        }}
-        ref={editorRef}
+        // data={content}
+        // onChange={handleEditorChange}
+        // ref={editorRef}
       />
-    </div>
+    </EditorWrapper>
   );
 }
 
 export default EditorComponent;
+
+// 스타일 영역
+const EditorWrapper = styled.div`
+  .ck-editor__editable {
+    height: 400px;
+  }
+`;

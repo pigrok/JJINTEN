@@ -52,6 +52,7 @@ function Form({ formModal, setFormModal }) {
         uid: state.uid,
         likeNumber: 0,
         likePeople: [],
+        views: 0,
         writer: user.displayName,
       };
       await addDoc(collection(db, "posts"), data);
@@ -106,10 +107,9 @@ function Form({ formModal, setFormModal }) {
                   }}
                 />
               </div>
-              <div>
-                <EditorComponent />
-                <StBodyInput
-                  type="text"
+              <div style={{ margin: "0px 10px 0px 10px" }}>
+                <EditorComponent
+                  // type="text"
                   name="body"
                   value={body}
                   onChange={(e) => {
@@ -117,9 +117,9 @@ function Form({ formModal, setFormModal }) {
                   }}
                 />
               </div>
-              <div>
+              {/* <div>
                 <input type="file" onChange={handleFileSelect} style={{ marginLeft: "10px" }} />
-              </div>
+              </div> */}
               <ButtonContainer>
                 <Stbutton marginRight="0px" onClick={cancelButtonHandler}>
                   취소
@@ -156,7 +156,7 @@ const StModalContent = styled.div`
   background-color: #fff;
   padding: 20px;
   width: 700px;
-  height: 600px;
+  height: 620px;
   border-radius: 10px;
 `;
 
