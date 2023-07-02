@@ -106,7 +106,7 @@ const RightContainer = styled.div`
   /* display: inline; */
   width: 100%;
   /* grid-row-gap: 10px;
-  grid-template-rows: 30px 30px auto; */
+grid-template-rows: 30px 30px auto; */
 `;
 
 const LinkBanner = styled.div`
