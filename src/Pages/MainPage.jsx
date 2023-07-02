@@ -78,7 +78,6 @@ function MainPage() {
           </CardSection>
         </RightContainer>
       </MainPageWrapper>
-      <Footer />
     </>
   );
 }
