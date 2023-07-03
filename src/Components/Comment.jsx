@@ -87,9 +87,9 @@ function Comment({ post, user, comment, comments, commentContents, commentNumber
           <ProfileImg src={profile}></ProfileImg>
           <CommentWriter>{writer}</CommentWriter>
         </CommentBox>
-        <CommentDate>{commentContents} </CommentDate>
+        <p style={{ marginLeft: "10px" }}>{commentContents} </p>
         <div>
-          <p>{processCreatedAt(modifiedDateComment(post))}</p>
+          <CommentDate>{processCreatedAt(modifiedDateComment(post))}</CommentDate>
           {isPostCreatedByCurrentUser ? (
             <>
               {editContents ? (
@@ -131,7 +131,8 @@ const CommentWriter = styled.p`
 `;
 
 const CommentDate = styled.p`
-  margin: 15px;
+  margin-top: 15px;
+  margin-left: 10px;
   font-size: 12px;
 `;
 
