@@ -98,14 +98,6 @@ function Form({ formModal, setFormModal }) {
               </div>
               <div>
                 <EditorComponent setBody={setBody} setSelectedFile={setSelectedFile} />
-                {/* <StBodyInput
-                  type="text"
-                  name="body"
-                  value={body}
-                  onChange={(e) => {
-                    setBody(e.target.value);
-                  }}
-                /> */}
               </div>
               <ButtonContainer>
                 <Stbutton marginRight="0px" onClick={cancelButtonHandler}>
@@ -143,7 +135,7 @@ const StModalContent = styled.div`
   background-color: #fff;
   padding: 20px;
   width: 700px;
-  height: 620px;
+  height: 600px;
   border-radius: 10px;
 `;
 
