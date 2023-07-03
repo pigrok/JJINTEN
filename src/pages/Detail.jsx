@@ -295,7 +295,7 @@ function Detail() {
                 <select value={category} onChange={(e) => setCategory(e.target.value)}>
                   <option value="콘서트">콘서트 </option>
                   <option value="전시">전시</option>
-                  <option value="공연">공연</option>
+                  <option value="클래식">클래식</option>
                   <option value="연극">연극</option>
                   <option value="뮤지컬">뮤지컬</option>
                   <option value="페스티벌">페스티벌</option>
@@ -362,7 +362,7 @@ function Detail() {
             </>
           ) : (
             <>
-              <CopyToClipboard text={`localhost:3000/${post?.id}/ `}>
+              <CopyToClipboard text={`https://jjinten.vercel.app/${post?.id}/ `}>
                 <FeatureButton
                   onClick={() => {
                     alert("공유 주소가 복사되었습니다!");
