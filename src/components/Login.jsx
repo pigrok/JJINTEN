@@ -136,7 +136,6 @@ function Login({ loginModal, setSignUpModal, setLoginModal }) {
             <StbackButton onClick={xButtonHandler}>X</StbackButton>
             <LogoContainer>
               <LogoImg src={logoPic} style={{ marginLeft: "5px" }} />
-              {/* <LogoSlogan>JJINTEN</LogoSlogan> */}
             </LogoContainer>
             <MainContainer>
               <InputBox type="email" placeholder="이메일을 입력해주세요." value={email} name="email" onChange={onChangeHandler} required />

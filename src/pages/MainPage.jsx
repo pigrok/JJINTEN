@@ -166,7 +166,7 @@ const Stbutton = styled.button`
 `;
 
 const SortButton = styled.button`
-  width: 70px;
+  width: 80px;
   height: 30px;
   /* margin-right: 10px; */
   cursor: pointer;
