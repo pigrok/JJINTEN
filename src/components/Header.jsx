@@ -4,7 +4,7 @@ import logoPic from "../assets/logo_nuki.png";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Login from "./Login";
-import SignUp from "./SignUp";
+import SingUp from "./SignUp";
 import { signOut } from "firebase/auth";
 import { logOutSuccess } from "../redux/modules/auth";
 import { auth } from "../firebase";
@@ -69,7 +69,7 @@ function Header() {
   return (
     <>
       <Login setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
-      <SignUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
+      <SingUp signUpModal={signUpModal} setSignUpModal={setSignUpModal} loginModal={loginModal} setLoginModal={setLoginModal} />
       <Form formModal={formModal} setFormModal={setFormModal} />
       <HeaderWrapper>
         <HeaderContainer>
