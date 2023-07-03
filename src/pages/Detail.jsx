@@ -362,7 +362,7 @@ function Detail() {
             </>
           ) : (
             <>
-              <CopyToClipboard text={`localhost:3000/${post?.id}/ `}>
+              <CopyToClipboard text={`https://jjinten.vercel.app/${post?.id}/ `}>
                 <FeatureButton
                   onClick={() => {
                     alert("공유 주소가 복사되었습니다!");
