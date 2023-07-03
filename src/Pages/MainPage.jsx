@@ -137,8 +137,8 @@ const SortSection = styled.div`
 const SearchSection = styled.div`
   height: 45px;
   text-align: right;
-  margin-right: 170px;
   margin-top: 10px;
+  margin-bottom: 60px;
 `;
 
 const CardSection = styled.div`
