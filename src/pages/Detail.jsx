@@ -323,7 +323,7 @@ function Detail() {
         <Body>
           <div>
             {post && (
-              <div style={{ marginBottom: "80px", width: "100%", whiteSpace: "pre-line" }}>
+              <div style={{ marginBottom: "90px", width: "100%", whiteSpace: "pre-line" }}>
                 {!edit ? (
                   <div className="Description" dangerouslySetInnerHTML={{ __html: post.body }}></div>
                 ) : (
